@@ -19,12 +19,12 @@ import org.apache.commons.vfs2.provider.sftp.SftpFileSystemConfigBuilder;
 import ink.codflow.security.LocalSecurityManager;
 import ink.codflow.sync.core.VfsSynchronzer;
 
-public class SftpVfsClient {
+public class SftpVfsClient implements VFSClient {
 
     boolean remote = true;
     // StandardFileSystemManager fileSystemManager;
     FileSystemManager manager;
-    VfsSynchronzer synchronzer = new VfsSynchronzer();
+    //VfsSynchronzer synchronzer = new VfsSynchronzer();
     FileSystemOptions opts;
     String prefix = "sftp://";
     String userPrefx = null;
@@ -104,5 +104,10 @@ public class SftpVfsClient {
         sb.append(host).append(absolutePath);
         return sb.toString();
     }
+
+	@Override
+	public boolean isRemote() {
+		return true;
+	}
 
 }

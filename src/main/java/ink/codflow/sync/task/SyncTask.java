@@ -1,6 +1,10 @@
 package ink.codflow.sync.task;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ink.codflow.bo.ObjectUriBO;
 import ink.codflow.sync.core.AbstractObjectWapper;
@@ -9,9 +13,13 @@ import ink.codflow.sync.core.SyncProgress;
 
 public class SyncTask implements Runnable {
 
+	
+	private static final Logger log = LoggerFactory.getLogger(SyncTask.class);
+
+	
     ClientEndpoint srcEndpoint;
     ClientEndpoint distEndpoint;
-    List<LinkWorker> workerList;
+    List<LinkWorker> workerList = new ArrayList<LinkWorker>();
     SyncProgress syncProgressView = new SyncProgress();
     List<ObjectUriBO> selectedObjects;
     String traceId;
@@ -42,26 +50,37 @@ public class SyncTask implements Runnable {
 
     @Override
     public void run() {
+    	try {
+            List<ObjectUriBO> objectUriBOs = this.selectedObjects;
+            if (objectUriBOs!=null && !objectUriBOs.isEmpty()) {
+                for (ObjectUriBO objectUriBO : objectUriBOs) {
+                    String srcUri = objectUriBO.getUri();
+                    AbstractObjectWapper<?> srcObject = srcEndpoint.resolve(srcUri);
+                    AbstractObjectWapper<?> destObject = distEndpoint.resolve(srcUri);
+                    LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
+                    workerList.add(linkWorker);
 
-        List<ObjectUriBO> objectUriBOs = this.selectedObjects;
-        for (ObjectUriBO objectUriBO : objectUriBOs) {
-            String srcUri = objectUriBO.getUri();
-            AbstractObjectWapper<?> srcObject = srcEndpoint.resolve(srcUri);
-            AbstractObjectWapper<?> destObject = srcEndpoint.resolve(srcUri);
-            LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
-            workerList.add(linkWorker);
+                }
+    		}else {
+                AbstractObjectWapper<?> srcObject = srcEndpoint.resolve(srcEndpoint.getRoot());
+                AbstractObjectWapper<?> destObject = distEndpoint.resolve(distEndpoint.getRoot());
+                LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
+                workerList.add(linkWorker);
 
-        }
+    		}
 
-        for (LinkWorker linkWorker : this.workerList) {
-            SyncProgress progress = linkWorker.analyse();
+            for (LinkWorker linkWorker : this.workerList) {
+                SyncProgress progress = linkWorker.analyse();
 
-        }
+            }
 
-        for (LinkWorker linkWorker : this.workerList) {
-            SyncProgress progress = linkWorker.sync();
+            for (LinkWorker linkWorker : this.workerList) {
+                SyncProgress progress = linkWorker.sync();
 
-        }
+            }
+		} catch (Exception e) {
+			log.error("tasl error",e);
+ 		}
     }
 
     public SyncProgress getSyncProgressView() {

@@ -2,23 +2,14 @@ package ink.codflow;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+ 
 
 import ink.codflow.sync.api.command.CommandApi;
-@SpringBootApplication
 public class Application {
 
     public static void main(String[] args) {
 
-        SpringApplication.run(Application.class, args);
 
-        CountDownLatch lock = new CountDownLatch(1);
-        try {
-            lock.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         // process(args);
     }
 

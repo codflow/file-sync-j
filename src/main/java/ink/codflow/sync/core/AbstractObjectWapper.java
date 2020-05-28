@@ -26,13 +26,15 @@ public abstract class AbstractObjectWapper<T> {
 
     
     
-    AbstractObjectWapper(T object) {
+    AbstractObjectWapper(T object,ClientEndpoint endpoint) {
+    	this.endpoint = endpoint;
         this.object = object;
     }
 
     public AbstractObjectWapper(String uri, ClientEndpoint endpoint) {
         this.uri = uri;
         this.endpoint = endpoint;
+        
     }
 
     T objectHandle() {
@@ -72,9 +74,15 @@ public abstract class AbstractObjectWapper<T> {
         this.endpoint = endpoint;
     }
 
-    public T getObject() {
+    public T getObject() throws FileException {
 
+        if (this.object != null) {
+            return this.object;
+        }
+        T object = doGetObject();
+        this.object = object;
         return object;
+    	
     }
 
     public boolean isFile() throws FileException {
@@ -149,5 +157,7 @@ public abstract class AbstractObjectWapper<T> {
     protected abstract long doGetSize() throws FileException;
 
     public abstract AbstractObjectWapper<?> createChildDir(String srcBaseName) throws FileException;
+    
+    public abstract T doGetObject() throws FileException; 
 
 }

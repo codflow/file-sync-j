@@ -12,7 +12,7 @@ import org.apache.commons.vfs2.util.FileObjectUtils;
 
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.ObjectManipulationAdapter;
-import ink.codflow.sync.core.SftpObjectWapper;
+import ink.codflow.sync.core.VfsObjectWapper;
 import ink.codflow.sync.exception.FileException;
 
 public class Vfs2VfsObjectManipulationAdapter implements ObjectManipulationAdapter<FileObject, FileObject> {
@@ -37,8 +37,10 @@ public class Vfs2VfsObjectManipulationAdapter implements ObjectManipulationAdapt
             }
         } else if (FileType.FOLDER.equals(srcType) && FileType.FOLDER.equals(destType)) {
             copyDirToDir(src, dest);
-        }
-        throw new FileException();
+        }else {
+            throw new FileException();
+
+		}
     }
 
     public void copyFileToFile(FileObject srcFile, FileObject destFile) throws FileException {

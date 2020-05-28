@@ -19,9 +19,10 @@ public class LocalSecurityManager {
         LocalVfsClient client = new LocalVfsClient();
         String userhome = System.getProperty("user.home");
         String keyDirPath = userhome + "//.ssh//id_rsa";
+        try {
         FileObject resFileObject = client.resolve(keyDirPath);
 
-        try {
+        
 
             if (resFileObject.exists()) {
                 return resFileObject.getContent().getByteArray();

@@ -7,30 +7,36 @@ import java.util.Map;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ink.codflow.sync.core.adapter.ObjectAdapter;
 import ink.codflow.sync.core.adapter.Vfs2VfsObjectManipulationAdapter;
 import ink.codflow.sync.core.adapter.VfsObjectAdapter;
 import ink.codflow.sync.exception.FileException;
+import ink.codflow.transfer.fsclient.VFSClient;
 
-public class SftpObjectWapper extends AbstractObjectWapper<FileObject> {
+public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
+
+	
+	private static final Logger log = LoggerFactory.getLogger(VfsObjectWapper.class);
 
     static ObjectAdapter<FileObject> OBJECT_ADAPTER = new VfsObjectAdapter();
     Vfs2VfsObjectManipulationAdapter objectManipulationAdapter = new Vfs2VfsObjectManipulationAdapter();
 
-    public SftpObjectWapper(String root, ClientEndpoint endpoint) {
+    public VfsObjectWapper(String root, ClientEndpoint endpoint) {
         super(root, endpoint);
     }
 
-    public SftpObjectWapper(FileObject fileObject) {
-        super(fileObject);
+    public VfsObjectWapper(FileObject fileObject,ClientEndpoint endpoint) {
+        super(fileObject,endpoint);
         String uri = fileObject.getName().getPath();
         this.setUri(uri);
     }
 
     @Override
     public HashMap<String, AbstractObjectWapper<FileObject>> subFilesMap() {
-
+    	
         return null;
     }
 
@@ -42,16 +48,16 @@ public class SftpObjectWapper extends AbstractObjectWapper<FileObject> {
 
     void copyFromWithTimeStamp(AbstractObjectWapper<?> objectWapper) throws FileException {
 
-        FileObject currentObject = getObject();
-        FileObject dst = (FileObject) objectWapper.getObject();
-        objectManipulationAdapter.copy(currentObject, dst);
+        FileObject dest = getObject();
+        FileObject src = (FileObject) objectWapper.getObject();
+        objectManipulationAdapter.copy(src, dest);
     }
 
     @Override
     public boolean doIsDir() throws FileException {
 
         try {
-            return this.object.isFolder();
+            return getObject().isFolder();
         } catch (FileSystemException e) {
             throw new FileException();
         }
@@ -63,18 +69,20 @@ public class SftpObjectWapper extends AbstractObjectWapper<FileObject> {
 
         try {
             List<AbstractObjectWapper<?>> abstractObjectWappers = new ArrayList<AbstractObjectWapper<?>>();
+            VFSClient client = getEndpoint().getRandomClient();
+            //FileObject[] fileObjects = this.object.getChildren();
+            FileObject[] fileObjects = client.list(this.uri);
 
-            FileObject[] fileObjects = this.object.getChildren();
             if (fileObjects != null && fileObjects.length > 0) {
                 for (FileObject fileObject : fileObjects) {
                     // TODO cache obj
-                    SftpObjectWapper objectWapper = new SftpObjectWapper(fileObject);
+                    VfsObjectWapper objectWapper = new VfsObjectWapper(fileObject,getEndpoint());
                     abstractObjectWappers.add(objectWapper);
                 }
             }
             return abstractObjectWappers;
 
-        } catch (FileSystemException e) {
+        } catch (FileException e) {
             throw new FileException();
         }
     }
@@ -95,21 +103,28 @@ public class SftpObjectWapper extends AbstractObjectWapper<FileObject> {
 
         try {
             Map<String, AbstractObjectWapper<?>> abstractObjectWappers = new HashMap<>();
+            if (exist) {
+                VFSClient client = getEndpoint().getRandomClient();
+                // client.list(this.uri);
+                 
+                 FileObject[] fileObjects = client.list(this.uri);
+                 //FileObject[] fileObjects = this.object.getChildren();
+                 if (fileObjects != null && fileObjects.length > 0) {
+                     for (FileObject fileObject : fileObjects) {
+                         // TODO cache obj
+                         VfsObjectWapper objectWapper = new VfsObjectWapper(fileObject,getEndpoint());
+                         String baseName = objectWapper.getBaseFileName();
+                         abstractObjectWappers.put(baseName, objectWapper);
+                     }
+                 }
 
-            FileObject[] fileObjects = this.object.getChildren();
-            if (fileObjects != null && fileObjects.length > 0) {
-                for (FileObject fileObject : fileObjects) {
-                    // TODO cache obj
-                    SftpObjectWapper objectWapper = new SftpObjectWapper(fileObject);
-                    String baseName = objectWapper.getBaseFileName();
-                    abstractObjectWappers.put(baseName, objectWapper);
-                }
-            }
+			}
 
             return abstractObjectWappers;
 
-        } catch (FileSystemException e) {
-            throw new FileException();
+        } catch (FileException e) {
+        	log.error(uri);
+            throw new FileException(e);
         }
     }
 
@@ -129,10 +144,10 @@ public class SftpObjectWapper extends AbstractObjectWapper<FileObject> {
     protected long doGetSize() throws FileException {
 
         try {
-            return this.object.getContent().getSize();
+            return this.getObject().getContent().getSize();
 
         } catch (FileSystemException e) {
-            throw new FileException();
+            throw new FileException(e);
         }
     }
 
@@ -140,9 +155,9 @@ public class SftpObjectWapper extends AbstractObjectWapper<FileObject> {
     public AbstractObjectWapper<?> createChildDir(String srcBaseName) throws FileException {
         FileObject newChild;
         try {
-            newChild = this.object.resolveFile(srcBaseName);
+            newChild = this.getObject().resolveFile(srcBaseName);
             
-            SftpObjectWapper objectWapper = new SftpObjectWapper(newChild);
+            VfsObjectWapper objectWapper = new VfsObjectWapper(newChild,getEndpoint());
             objectWapper.setDirectory(true);
             objectWapper.setExist(false);
             return objectWapper;
@@ -151,5 +166,13 @@ public class SftpObjectWapper extends AbstractObjectWapper<FileObject> {
         }
 
     }
+
+	@Override
+	public FileObject doGetObject() throws FileException {
+		VFSClient client = getEndpoint().getRandomClient();
+		return client.resolve(uri);
+	}
+    
+    
 
 }

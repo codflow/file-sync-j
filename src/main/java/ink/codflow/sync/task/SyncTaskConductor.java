@@ -27,7 +27,7 @@ public class SyncTaskConductor {
 
 	ClientEndpoint getEndpoint(ClientEndpointBO endpointBO) {
 		int clientId = endpointBO.getId();
-
+		
 		ClientEndpoint endPoint = clientPool.getEndpoint(clientId);
 		if (endPoint == null) {
 			endPoint = clientPool.create(endpointBO);
@@ -36,9 +36,9 @@ public class SyncTaskConductor {
 	}
 
 	public SyncTask launch(LinkBO link, List<ObjectUriBO> selectedObjects, boolean startImmediatly) {
-		Integer srcId = link.getDistEndpoint().getId();
-		Integer dstId = link.getSrcEndpoint().getId();
-		SyncTask task = createTask(srcId, dstId, selectedObjects, null);
+		
+		
+		SyncTask task = createTask(link, selectedObjects, FileSyncMode.FILE_INC);
 		pool.submit(task);
 		return task;
 	}
@@ -77,4 +77,8 @@ public class SyncTaskConductor {
 		return createTask(srcEndpointId, dstEndpointId, objectUriList, mode0);
 
 	}
+	
+	
+	
+	
 }

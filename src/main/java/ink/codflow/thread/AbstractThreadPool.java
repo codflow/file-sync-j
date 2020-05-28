@@ -10,7 +10,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang3.StringUtils;
 
 public class AbstractThreadPool {
 
@@ -59,7 +58,7 @@ public class AbstractThreadPool {
         private final ThreadGroup threadGroup;
 
         public CustomThreadFactory(String prefix, boolean daemo) {
-            this.prefix = StringUtils.isNotEmpty(prefix) ? prefix + "-thread-" : "";
+            this.prefix = prefix.length()>0 ? prefix + "-thread-" : "";
             daemoThread = daemo;
             SecurityManager s = System.getSecurityManager();
             threadGroup = (s == null) ? Thread.currentThread().getThreadGroup() : s.getThreadGroup();
