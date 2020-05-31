@@ -6,8 +6,8 @@ import org.apache.commons.vfs2.FileObject;
 import ink.codflow.security.LocalSecurityManager;
 import ink.codflow.sync.core.VfsSynchronzer;
 import ink.codflow.sync.exception.FileException;
-import ink.codflow.transfer.fsclient.LocalVfsClient;
-import ink.codflow.transfer.fsclient.SftpVfsClient;
+import ink.codflow.transfer.vfs.LocalVfsClient;
+import ink.codflow.transfer.vfs.SftpVfsClient;
 
 public class CommandApi {
 

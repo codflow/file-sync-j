@@ -3,7 +3,7 @@ package ink.codflow.bo;
 import lombok.Data;
 
 @Data
-public class ObjectUriBO {
+public class ObjectBO {
     
     int linkId;
     
@@ -11,6 +11,7 @@ public class ObjectUriBO {
     
     String uri;
     
-    
+    String name;
+
     
 }

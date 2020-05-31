@@ -1,4 +1,4 @@
-package ink.codflow.transfer.fsclient;
+package ink.codflow.transfer.vfs;
 
 import java.util.Properties;
 

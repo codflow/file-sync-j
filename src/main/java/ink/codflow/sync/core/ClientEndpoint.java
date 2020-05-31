@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import ink.codflow.transfer.fsclient.VFSClient;
+import ink.codflow.transfer.vfs.Client;
 
-public class ClientEndpoint {
+public class ClientEndpoint<T> {
 
 	static final Random RANDOM = new Random();
 
@@ -14,7 +14,7 @@ public class ClientEndpoint {
 
 	String root;
 
-	List<VFSClient> clientList = new ArrayList<>();
+	List<Client<T>> clientList = new ArrayList<>();
 
 	public int getId() {
 
@@ -25,16 +25,24 @@ public class ClientEndpoint {
 		this.id = id;
 	}
 
-	public synchronized void addClient(VFSClient client) {
+	public synchronized void addClient(Client<T> client) {
 		clientList.add(client);
 	}
 
-	public AbstractObjectWapper<?> resolve(String uri) {
-		int size = clientList.size();
+	public AbstractObjectWapper<T> resolve(String uri) {
 
-		AbstractObjectWapper<?> abstractObjectWapper = new VfsObjectWapper(uri, this);
+		AbstractObjectWapper<T> abstractObjectWapper0 = getRandomClient().resolveWapper(uri);
+		abstractObjectWapper0.setEndpoint(this);
 
-		return abstractObjectWapper;
+		return abstractObjectWapper0;
+	}
+	
+
+	public AbstractObjectWapper<T> resolveRelatively(String uri) {
+
+		String path =new  StringBuilder(this.getRoot()).append(uri).toString(); 
+
+		return resolve(path);
 	}
 
 	public String getRoot() {
@@ -46,7 +54,7 @@ public class ClientEndpoint {
 	}
 
 	// TODO read lock
-	public synchronized VFSClient getRandomClient() {
+	public synchronized Client<T> getRandomClient() {
 		int size = this.clientList.size();
 		int index = size > 1 ? RANDOM.nextInt(size) : 0;
 		return this.clientList.get(index);

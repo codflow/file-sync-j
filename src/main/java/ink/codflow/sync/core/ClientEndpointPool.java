@@ -3,32 +3,33 @@ package ink.codflow.sync.core;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 import ink.codflow.bo.AuthenticationBO;
 import ink.codflow.bo.ClientEndpointBO;
 import ink.codflow.security.LocalSecurityManager;
 import ink.codflow.sync.consts.AuthDataType;
 import ink.codflow.sync.consts.AuthenticationType;
 import ink.codflow.sync.consts.ClientTypeEnum;
-import ink.codflow.transfer.fsclient.LocalVfsClient;
-import ink.codflow.transfer.fsclient.SftpVfsClient;
-import ink.codflow.transfer.fsclient.VFSClient;
+import ink.codflow.transfer.vfs.Client;
+import ink.codflow.transfer.vfs.LocalVfsClient;
+import ink.codflow.transfer.vfs.SftpVfsClient;
 
 public class ClientEndpointPool {
 
-	Map<Integer, ClientEndpoint> endpointMap = new ConcurrentHashMap<Integer, ClientEndpoint>();
+	Map<Integer, ClientEndpoint<?>> endpointMap = new ConcurrentHashMap<>();
 
-	//String root;
+	// String root;
 
-	public ClientEndpoint getEndpoint(int clientId) {
+	public ClientEndpoint<?> getEndpoint(int clientId) {
 		return endpointMap.get(clientId);
 
 	}
 
-	public ClientEndpoint create(ClientEndpointBO endpointBO) {
+	public ClientEndpoint<?> create(ClientEndpointBO endpointBO) {
 
-		ClientEndpoint clientEndpoint = new ClientEndpoint();
+		ClientEndpoint<?>  clientEndpoint = new ClientEndpoint<>();
 		int id = endpointBO.getId();
-		VFSClient sftpVfsClient = doCreateClient(endpointBO);
+		Client sftpVfsClient = doCreateClient(endpointBO);
 		clientEndpoint.addClient(sftpVfsClient);
 		String rootPath = endpointBO.getRootPath();
 		clientEndpoint.root = rootPath;
@@ -37,7 +38,7 @@ public class ClientEndpointPool {
 
 	}
 
-	VFSClient doCreateClient(ClientEndpointBO endpointBO) {
+	Client<?> doCreateClient(ClientEndpointBO endpointBO) {
 		ClientTypeEnum type = endpointBO.getType();
 
 		switch (type) {
@@ -57,7 +58,7 @@ public class ClientEndpointPool {
 		return null;
 	}
 
-	private VFSClient createLocalClient() {
+	private LocalVfsClient createLocalClient() {
 		LocalVfsClient cLocalVfsClient = new LocalVfsClient();
 		return cLocalVfsClient;
 	}
@@ -84,7 +85,6 @@ public class ClientEndpointPool {
 		default:
 			return null;
 		}
-
 	}
 
 }

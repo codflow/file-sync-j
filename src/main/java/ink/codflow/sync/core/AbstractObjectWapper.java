@@ -1,6 +1,5 @@
 package ink.codflow.sync.core;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +15,7 @@ public abstract class AbstractObjectWapper<T> {
 
     String baseFileName;
 
-    ClientEndpoint endpoint;
+    ClientEndpoint<T> endpoint;
 
     Boolean directory;
 
@@ -26,12 +25,12 @@ public abstract class AbstractObjectWapper<T> {
 
     
     
-    AbstractObjectWapper(T object,ClientEndpoint endpoint) {
+    AbstractObjectWapper(T object,ClientEndpoint<T> endpoint) {
     	this.endpoint = endpoint;
         this.object = object;
     }
 
-    public AbstractObjectWapper(String uri, ClientEndpoint endpoint) {
+    public AbstractObjectWapper(String uri, ClientEndpoint<T> endpoint) {
         this.uri = uri;
         this.endpoint = endpoint;
         
@@ -42,9 +41,8 @@ public abstract class AbstractObjectWapper<T> {
 
     }
 
-    public abstract HashMap<String, AbstractObjectWapper<T>> subFilesMap();
 
-    public abstract void copyFrom(AbstractObjectWapper<?> objectWapper) throws FileException;
+    
 
     public String getUri() {
 
@@ -66,11 +64,11 @@ public abstract class AbstractObjectWapper<T> {
         this.baseFileName = baseFileName;
     }
 
-    public ClientEndpoint getEndpoint() {
+    public ClientEndpoint<T> getEndpoint() {
         return endpoint;
     }
 
-    public void setEndpoint(ClientEndpoint endpoint) {
+    public void setEndpoint(ClientEndpoint<T>  endpoint) {
         this.endpoint = endpoint;
     }
 
@@ -79,9 +77,9 @@ public abstract class AbstractObjectWapper<T> {
         if (this.object != null) {
             return this.object;
         }
-        T object = doGetObject();
-        this.object = object;
-        return object;
+        T object0 = doGetObject();
+        this.object = object0;
+        return object0;
     	
     }
 
@@ -113,9 +111,9 @@ public abstract class AbstractObjectWapper<T> {
         if (this.baseFileName != null) {
             return this.baseFileName;
         }
-        String baseFileName = doGetBaseName();
-        this.baseFileName = baseFileName;
-        return baseFileName;
+        String baseFileName0 = doGetBaseName();
+        this.baseFileName = baseFileName0;
+        return baseFileName0;
     }
 
     public long getSize() throws FileException {
@@ -146,9 +144,9 @@ public abstract class AbstractObjectWapper<T> {
 
     protected abstract boolean doIsDir() throws FileException;
 
-    public abstract List<AbstractObjectWapper<?>> listChildren() throws FileException;
+    public abstract List<AbstractObjectWapper<T>> listChildren() throws FileException;
 
-    public abstract Map<String, AbstractObjectWapper<?>> mapChildren() throws FileException;
+    public abstract Map<String, AbstractObjectWapper<T>> mapChildren() throws FileException;
 
     protected abstract String doGetUri();
 
@@ -156,8 +154,12 @@ public abstract class AbstractObjectWapper<T> {
 
     protected abstract long doGetSize() throws FileException;
 
-    public abstract AbstractObjectWapper<?> createChildDir(String srcBaseName) throws FileException;
+    public abstract AbstractObjectWapper<T> createChildDir(String srcBaseName) throws FileException;
     
     public abstract T doGetObject() throws FileException; 
+    
+    
+    public abstract void copyFrom(AbstractObjectWapper<?> objectWapper) throws FileException;
+
 
 }

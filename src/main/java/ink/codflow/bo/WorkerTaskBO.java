@@ -10,9 +10,9 @@ public class WorkerTaskBO {
 
     LinkBO linkBO;
     
-    List<ObjectUriBO> objectUriList = new ArrayList<ObjectUriBO>();
+    List<ObjectBO> objectUriList = new ArrayList<ObjectBO>();
     
-    public void addObjectUri(ObjectUriBO e) {
+    public void addObjectUri(ObjectBO e) {
         objectUriList.add(e);
     }
 }

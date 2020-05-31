@@ -2,37 +2,46 @@ package ink.codflow;
 
 import java.util.concurrent.CountDownLatch;
 
- 
 
+import ink.codflow.manager.FileSyncManager;
 import ink.codflow.sync.api.command.CommandApi;
+import ink.codflow.sync.task.SyncTaskConductor;
+import ink.codflow.ui.MainInterface;
+
 public class Application {
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
 
+		SyncTaskConductor conductor = new SyncTaskConductor();
 
-        // process(args);
-    }
+		FileSyncManager fileSyncManager = new FileSyncManager(conductor);
 
-    static boolean process(String[] args) {
+		MainInterface mainInterface = new MainInterface(fileSyncManager);
 
-        boolean isServerMode = false;
-        CommandApi commandApi = new CommandApi();
+		mainInterface.loadMainPanel();
 
-        commandApi.dispatch(args);
+	}
 
-        // for (int i = 0; i < args.length; i++) {
-        // switch (args[i]) {
-        // case "-S":
+	static boolean process(String[] args) {
 
-        // break;
+		boolean isServerMode = false;
+		CommandApi commandApi = new CommandApi();
 
-        // default:
-        // break;
-        // }
+		commandApi.dispatch(args);
 
-        // }
+		for (int i = 0; i < args.length; i++) {
+			switch (args[i]) {
+			case "-S":
 
-        return false;
-    }
+				break;
+
+			default:
+				break;
+			}
+
+		}
+
+		return false;
+	}
 
 }

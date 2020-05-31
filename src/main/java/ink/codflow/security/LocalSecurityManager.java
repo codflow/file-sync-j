@@ -7,7 +7,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 
 import ink.codflow.exception.SecurityInitFailureException;
-import ink.codflow.transfer.fsclient.*;
+import ink.codflow.transfer.vfs.*;
 
 public class LocalSecurityManager {
 

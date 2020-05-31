@@ -6,7 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ink.codflow.bo.ObjectUriBO;
+import ink.codflow.bo.ObjectBO;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.ClientEndpoint;
 import ink.codflow.sync.core.SyncProgress;
@@ -21,7 +21,7 @@ public class SyncTask implements Runnable {
     ClientEndpoint distEndpoint;
     List<LinkWorker> workerList = new ArrayList<LinkWorker>();
     SyncProgress syncProgressView = new SyncProgress();
-    List<ObjectUriBO> selectedObjects;
+    List<ObjectBO> selectedObjects;
     String traceId;
 
     public ClientEndpoint getSrcEndpoint() {
@@ -51,9 +51,9 @@ public class SyncTask implements Runnable {
     @Override
     public void run() {
     	try {
-            List<ObjectUriBO> objectUriBOs = this.selectedObjects;
+            List<ObjectBO> objectUriBOs = this.selectedObjects;
             if (objectUriBOs!=null && !objectUriBOs.isEmpty()) {
-                for (ObjectUriBO objectUriBO : objectUriBOs) {
+                for (ObjectBO objectUriBO : objectUriBOs) {
                     String srcUri = objectUriBO.getUri();
                     AbstractObjectWapper<?> srcObject = srcEndpoint.resolve(srcUri);
                     AbstractObjectWapper<?> destObject = distEndpoint.resolve(srcUri);

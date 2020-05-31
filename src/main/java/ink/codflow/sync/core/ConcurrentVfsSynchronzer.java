@@ -7,7 +7,7 @@ import java.util.List;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 
-import ink.codflow.transfer.fsclient.*;
+import ink.codflow.transfer.vfs.*;
 
 public class ConcurrentVfsSynchronzer extends VfsSynchronzer {
 
@@ -36,9 +36,6 @@ public class ConcurrentVfsSynchronzer extends VfsSynchronzer {
 
     private void doCopy(FileObject fileObject, FileObject tagetObject) {
         try {
-            // long modTime = fileObject.getContent().getLastModifiedTime();
-            // tagetObject.copyFrom(fileObject, allFileSelector);
-
             copyWithTimestamp(tagetObject, fileObject);
 
             // tagetObject.getContent().setLastModifiedTime(modTime);
