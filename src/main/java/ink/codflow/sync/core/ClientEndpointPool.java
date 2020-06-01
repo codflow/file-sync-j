@@ -3,22 +3,21 @@ package ink.codflow.sync.core;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
-import ink.codflow.bo.AuthenticationBO;
-import ink.codflow.bo.ClientEndpointBO;
-import ink.codflow.security.LocalSecurityManager;
+import ink.codflow.sync.bo.AuthenticationBO;
+import ink.codflow.sync.bo.ClientEndpointBO;
 import ink.codflow.sync.consts.AuthDataType;
 import ink.codflow.sync.consts.AuthenticationType;
 import ink.codflow.sync.consts.ClientTypeEnum;
-import ink.codflow.transfer.vfs.Client;
-import ink.codflow.transfer.vfs.LocalVfsClient;
-import ink.codflow.transfer.vfs.SftpVfsClient;
+import ink.codflow.sync.security.LocalSecurityManager;
+import ink.codflow.sync.transfer.Client;
+import ink.codflow.sync.transfer.oss.OssAuthentication;
+import ink.codflow.sync.transfer.oss.OssClient;
+import ink.codflow.sync.transfer.vfs.LocalVfsClient;
+import ink.codflow.sync.transfer.vfs.SftpVfsClient;
 
 public class ClientEndpointPool {
 
 	Map<Integer, ClientEndpoint<?>> endpointMap = new ConcurrentHashMap<>();
-
-	// String root;
 
 	public ClientEndpoint<?> getEndpoint(int clientId) {
 		return endpointMap.get(clientId);
@@ -27,12 +26,14 @@ public class ClientEndpointPool {
 
 	public ClientEndpoint<?> create(ClientEndpointBO endpointBO) {
 
-		ClientEndpoint<?>  clientEndpoint = new ClientEndpoint<>();
+		ClientEndpoint<?> clientEndpoint = new ClientEndpoint<>();
 		int id = endpointBO.getId();
-		Client sftpVfsClient = doCreateClient(endpointBO);
-		clientEndpoint.addClient(sftpVfsClient);
+		@SuppressWarnings("rawtypes")
+		Client client = doCreateClient(endpointBO);
+		clientEndpoint.addClient(client);
 		String rootPath = endpointBO.getRootPath();
 		clientEndpoint.root = rootPath;
+		clientEndpoint.setId(id);
 		endpointMap.put(id, clientEndpoint);
 		return clientEndpoint;
 
@@ -46,16 +47,31 @@ public class ClientEndpointPool {
 			return createLocalClient();
 
 		case SFTP:
-			AuthenticationBO authenticationBO = endpointBO.getAuthenticationBO();
-			return createSftpClient(authenticationBO);
+			AuthenticationBO sftpAuth = endpointBO.getAuthenticationBO();
+			return createSftpClient(sftpAuth);
 		case OSS:
 
-			break;
+			AuthenticationBO ossAuth = endpointBO.getAuthenticationBO();
+			return createOssClient(ossAuth);
+
 		default:
 			break;
 		}
 
 		return null;
+	}
+
+	private Client<?> createOssClient(AuthenticationBO ossAuth) {
+		
+		String endpoint = ossAuth.getParam(AuthDataType.HOST);
+		String ak = ossAuth.getParam(AuthDataType.AK);
+		String sk = ossAuth.getParam(AuthDataType.SK);
+		OssAuthentication authentication = new OssAuthentication();
+		authentication.setAccessKeyId(ak);
+		authentication.setAccessKeySecret(sk);
+		authentication.setEndpoint(endpoint);
+		OssClient client = new OssClient(authentication);
+		return client;
 	}
 
 	private LocalVfsClient createLocalClient() {

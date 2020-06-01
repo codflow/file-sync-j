@@ -7,7 +7,7 @@ import java.util.List;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 
-import ink.codflow.transfer.vfs.*;
+import ink.codflow.sync.transfer.vfs.*;
 
 public class ConcurrentVfsSynchronzer extends VfsSynchronzer {
 

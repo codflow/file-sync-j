@@ -5,9 +5,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import ink.codflow.bo.ClientEndpointBO;
-import ink.codflow.bo.LinkBO;
-import ink.codflow.bo.ObjectBO;
+
+import ink.codflow.sync.bo.ClientEndpointBO;
+import ink.codflow.sync.bo.LinkBO;
+import ink.codflow.sync.bo.ObjectBO;
+import ink.codflow.sync.bo.TaskBO;
+import ink.codflow.sync.bo.WorkerTaskBO;
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.core.ClientEndpoint;
 import ink.codflow.sync.core.ClientEndpointPool;
@@ -40,15 +43,13 @@ public class SyncTaskConductor {
 		return endPoint;
 	}
 
-	public SyncTask launch(LinkBO link, List<ObjectBO> selectedObjects, boolean startImmediatly) {
+	public SyncTask createSyncTask(LinkBO link, List<ObjectBO> selectedObjects, FileSyncMode mode) {
 
-		SyncTask task = createTask(link, selectedObjects, FileSyncMode.FILE_INC);
-		pool.submit(task);
-		return task;
+		FileSyncMode mode0 = mode != null ? mode : link.getMode();
+		return createTask(link, selectedObjects, mode0);
 	}
 
 	public void launch(SyncTask task) {
-
 		pool.submit(task);
 	}
 
@@ -57,10 +58,16 @@ public class SyncTaskConductor {
 
 		ClientEndpoint<?> srcEndpoint = clientPool.getEndpoint(srcEndpointId);
 		ClientEndpoint<?> dstEndpoint = clientPool.getEndpoint(dstEndpointId);
+		return createTask(srcEndpoint, dstEndpoint, selectedObjects, mode);
+	}
+
+	protected SyncTask createTask(ClientEndpoint<?> srcEndpoint, ClientEndpoint<?> dstEndpoint,
+			List<ObjectBO> selectedObjects, FileSyncMode mode) {
 
 		SyncTask syncTask = new SyncTask();
 		syncTask.setDistEndpoint(dstEndpoint);
 		syncTask.setSrcEndpoint(srcEndpoint);
+		syncTask.setMode(mode != null ? mode : FileSyncMode.SYNC);
 		return syncTask;
 	}
 
@@ -73,13 +80,35 @@ public class SyncTaskConductor {
 		ClientEndpoint<?> srcEndpoint0 = clientPool.getEndpoint(srcEndpointId);
 		ClientEndpoint<?> destEndpoint0 = clientPool.getEndpoint(dstEndpointId);
 
-		ClientEndpoint<?> srcEndpoint = srcEndpoint0 != null ? srcEndpoint0 : getEndpoint(srcEndpointBO);
-		ClientEndpoint<?> destEndpoint = destEndpoint0 != null ? destEndpoint0 : getEndpoint(destEndpointBO);
+		if (srcEndpoint0 == null) {
+			getEndpoint(srcEndpointBO);
+		}
+		if (destEndpoint0 == null) {
+			getEndpoint(destEndpointBO);
+		}
 
 		FileSyncMode mode0 = mode != null ? mode : linkBO.getMode();
 		linkBO.getMaxThread();
 		return createTask(srcEndpointId, dstEndpointId, objectUriList, mode0);
 
+	}
+
+	public SyncTask createSyncTask(TaskBO taskBO) {
+
+		SyncTask task = new SyncTask();
+
+		List<WorkerTaskBO> workerTasklist = taskBO.getWorkerTasklist();
+		for (WorkerTaskBO workerTaskBO : workerTasklist) {
+			List<ObjectBO> objectUriList = workerTaskBO.getObjectUriList();
+			LinkBO linkBO = workerTaskBO.getLinkBO();
+			ClientEndpointBO distEndpointBO = linkBO.getDistEndpoint();
+			ClientEndpointBO srcEndpointBO = linkBO.getSrcEndpoint();
+			FileSyncMode mode = linkBO.getMode();
+			registerEndpoint(srcEndpointBO);
+			registerEndpoint(distEndpointBO);
+			task.addSubTask(createTask(linkBO, objectUriList, mode));
+		}
+		return task;
 	}
 
 }

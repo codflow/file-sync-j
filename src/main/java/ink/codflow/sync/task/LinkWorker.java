@@ -1,13 +1,14 @@
 package ink.codflow.sync.task;
 
-import java.util.List;
-import java.util.Map;
+
 
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.SyncProgress;
 import ink.codflow.sync.exception.FileException;
 
 public class LinkWorker {
+
+	IncreaseFileWorkerHandler workerHandler;
 
 	SyncProgress progress = new SyncProgress();
 
@@ -47,67 +48,12 @@ public class LinkWorker {
 		return progress;
 	}
 
-	// src object type: dir,file ;dest object type: dir
 	public long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
-
-		long totalSize = 0;
-		try {
-			Map<String, ?> destMap = (destObject != null && destObject.isDir()) ? destObject.mapChildren() : null;
-
-			if (srcObject.isDir()) {
-
-				List<?> srcList = srcObject.listChildren();
-
-				for (int i = 0; i < srcList.size(); i++) {
-					AbstractObjectWapper<?> srcElement = (AbstractObjectWapper<?>) srcList.get(i);
-					String srcBaseName = srcElement.getBaseFileName();
-					if (destMap != null && destMap.containsKey(srcBaseName)) {
-
-						AbstractObjectWapper<?> destElement = (AbstractObjectWapper<?>) destMap.get(srcBaseName);
-						totalSize += doAnalyse(srcElement, destElement);
-					} else {
-						//
-						if (srcElement.isFile()) {
-							// TODO compare ts
-							totalSize += countSize(srcElement);
-						} else {
-							AbstractObjectWapper<?> destElement0 = destObject.createChildDir(srcBaseName);
-							totalSize += doAnalyse(srcElement, destElement0);
-
-						}
-					}
-				}
-			} else if (srcObject.isFile()) {
-				String srcBaseName = srcObject.getBaseFileName();
-				if ((destMap == null && isDiffFile(srcObject, destObject))
-						|| (destMap != null && !destMap.containsKey(srcBaseName))) {
-					long objectSize = countSize(srcObject);
-					totalSize += objectSize;
-				}
-			}
-		} catch (FileException e) {
-
-			e.printStackTrace();
-		}
-
-		// checkAndLaunch(srcObject,destObject,totalSize);
-
-		return totalSize;
-	}
-
-	private void checkAndLaunch(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject, long totalSize) {
-		// TODO Auto-generated method stub
+		return workerHandler.doAnalyse(srcObject, destObject);
 
 	}
 
-	private long countSize(AbstractObjectWapper<?> srcObject) throws FileException {
 
-		long size = srcObject.getSize();
-		recordAnalyseFileCount();
-		recordAnalyseFileSize(size);
-		return size;
-
-	}
 
 	public SyncProgress sync(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
 		if (srcObject == null) {
@@ -122,58 +68,41 @@ public class LinkWorker {
 
 	// src object type: dir,file ;dest object type: dir,file
 	protected void doSync(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
-
-		try {
-			Map<String, ? extends AbstractObjectWapper<?>> destMap = destObject.isDir() ? destObject.mapChildren()
-					: null;
-
-			if (srcObject.isDir()) {
-
-				// Map<String, AbstractObjectWapper<?>> destMap = destObject.mapChildren();
-				List<? extends AbstractObjectWapper<?>> srcList = srcObject.listChildren();
-				for (int i = 0; i < srcList.size(); i++) {
-					AbstractObjectWapper<?> srcElement = srcList.get(i);
-					String srcBaseName = srcElement.getBaseFileName();
-					if (destMap != null && destMap.containsKey(srcBaseName)) {
-						AbstractObjectWapper<?> destElement = destMap.get(srcBaseName);
-						doSync(srcElement, destElement);
-					} else {
-						doCopy(srcObject, destObject);
-					}
-				}
-			} else if (srcObject.isFile()) {
-
-				String srcBaseName = srcObject.getBaseFileName();
-
-				if ((destMap == null && isDiffFile(srcObject, destObject))
-						|| (destMap != null && !destMap.containsKey(srcBaseName))) {
-					doCopy(srcObject, destObject);
-				}
-			}
-		} catch (FileException e) {
-
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		workerHandler.doSync(srcObject, destObject);
 	}
 
-	private boolean isDiffFile(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject)
-			throws FileException {
-		// is double check necessary?
-		return srcObject.isDiff(destObject);
-	}
-
-	void submitSubLink() {
-
-	}
-
-	void doCopy(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?>  destObject) throws FileException {
+	void doCopy(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) throws FileException {
 		doRecord();
 		destObject.copyFrom(srcObject);
 	}
 
+	class CopyListener {
+
+		public void doRecord(AbstractObjectWapper<?> srcObject) throws FileException {
+
+			long size = srcObject.getSize();
+			recordSyncedFileSize(size);
+			recordSyncedFileCount();
+		}
+
+		void recordSyncedFileSize(long size) {
+			progress.addSyncedSize(size);
+		}
+
+		void recordSyncedFileCount() {
+			progress.increaseSyncedFileCount();
+		}
+	}
+	
+	
+	class AnalyseListener{
+		
+		
+	}
+	
+
 	private void doRecord() {
+
 		// TODO Auto-generated method stub
 
 	}

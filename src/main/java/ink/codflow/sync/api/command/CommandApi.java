@@ -2,12 +2,12 @@ package ink.codflow.sync.api.command;
 
 import org.apache.commons.vfs2.FileObject;
 
- import ink.codflow.exception.SecurityInitFailureException;
-import ink.codflow.security.LocalSecurityManager;
 import ink.codflow.sync.core.VfsSynchronzer;
 import ink.codflow.sync.exception.FileException;
-import ink.codflow.transfer.vfs.LocalVfsClient;
-import ink.codflow.transfer.vfs.SftpVfsClient;
+import ink.codflow.sync.exception.SecurityInitFailureException;
+import ink.codflow.sync.security.LocalSecurityManager;
+import ink.codflow.sync.transfer.vfs.LocalVfsClient;
+import ink.codflow.sync.transfer.vfs.SftpVfsClient;
 
 public class CommandApi {
 

@@ -16,6 +16,10 @@ public class FileException extends IOException {
 	public FileException(Throwable e) {
 		super(e);
 	}
+	
+	public FileException(String msg) {
+		super(msg);
+	}
 
 	public FileException(String msg, Throwable e) {
 		super(msg, e);

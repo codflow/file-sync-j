@@ -6,9 +6,9 @@ import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
 
-import ink.codflow.bo.AuthenticationBO;
-import ink.codflow.bo.ClientEndpointBO;
-import ink.codflow.bo.LinkBO;
+import ink.codflow.sync.bo.AuthenticationBO;
+import ink.codflow.sync.bo.ClientEndpointBO;
+import ink.codflow.sync.bo.LinkBO;
 import ink.codflow.sync.consts.AuthDataType;
 import ink.codflow.sync.consts.AuthenticationType;
 import ink.codflow.sync.consts.ClientTypeEnum;
@@ -44,7 +44,7 @@ public class SyncTaskConductorTest {
 		
 		SyncTaskConductor conductor = new SyncTaskConductor();
 		
-		conductor.launch(linkBO, null, true);
+		conductor.createSyncTask(linkBO, null,null);
 	    CountDownLatch countDownLatch = new CountDownLatch(1);
 	    try {
 			countDownLatch.await();

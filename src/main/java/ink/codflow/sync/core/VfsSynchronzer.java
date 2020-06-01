@@ -13,7 +13,7 @@ import org.apache.commons.vfs2.FileUtil;
 import org.apache.commons.vfs2.NameScope;
 import org.apache.commons.vfs2.util.FileObjectUtils;
 
-import ink.codflow.exception.BackupFileChangedException;
+import ink.codflow.sync.exception.BackupFileChangedException;
 
 public class VfsSynchronzer {
 

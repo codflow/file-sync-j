@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import ink.codflow.transfer.vfs.Client;
+import ink.codflow.sync.transfer.Client;
 
 public class ClientEndpoint<T> {
 
