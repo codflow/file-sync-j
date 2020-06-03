@@ -12,14 +12,12 @@ import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.transfer.Client;
 
 public class LocalVfsClient implements Client<FileObject> {
-	
-	
 
 	public static final ClientTypeEnum TYPE = ClientTypeEnum.LOCAL;
 
-	FileSystemManager fsManager ;
+	FileSystemManager fsManager;
 
-	public LocalVfsClient(){
+	public LocalVfsClient() {
 		StandardFileSystemManager standardFileSystemManager = new StandardFileSystemManager();
 		try {
 			standardFileSystemManager.init();
@@ -28,7 +26,7 @@ public class LocalVfsClient implements Client<FileObject> {
 		}
 		fsManager = standardFileSystemManager;
 	}
-	
+
 	@Override
 	public FileObject[] list(String path) throws FileException {
 

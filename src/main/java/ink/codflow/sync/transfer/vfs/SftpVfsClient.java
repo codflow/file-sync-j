@@ -18,7 +18,6 @@ import org.apache.commons.vfs2.provider.sftp.SftpFileSystemConfigBuilder;
 
 import ink.codflow.sync.consts.ClientTypeEnum;
 import ink.codflow.sync.core.AbstractObjectWapper;
-import ink.codflow.sync.core.VfsSynchronzer;
 import ink.codflow.sync.security.LocalSecurityManager;
 import ink.codflow.sync.transfer.Client;
 

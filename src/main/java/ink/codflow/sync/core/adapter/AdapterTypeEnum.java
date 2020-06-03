@@ -12,10 +12,11 @@ public enum AdapterTypeEnum {
 
 	public static AdapterTypeEnum resolve(Class<?> srcClazz, Class<?> destClazz) {
 
-		if (FileObject.class.equals(srcClazz) && FileObject.class.equals(destClazz)) {
+		if (FileObject.class.isAssignableFrom(srcClazz) && FileObject.class.isAssignableFrom(destClazz)) {
 			return VFS2VFS;
 		}
-		if (FileObject.class.equals(srcClazz) && OssObject.class.equals(destClazz)) {
+		
+		if (FileObject.class.isAssignableFrom(srcClazz) && OssObject.class.isAssignableFrom(destClazz)) {
 			return VFS2OSS;
 		}
 		throw new AdapterTypeNotFoundException();

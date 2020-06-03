@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,9 +84,12 @@ public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
 	}
 
 	@Override
-	protected String doGetUri() {
-		// TODO Auto-generated method stub
-		return null;
+	protected String doGetUri() throws FileException {
+		try {
+			return getObject().getName().getPath();
+		} catch (FileException e) {
+			throw new FileException(e);
+		}
 	}
 
 	@Override
@@ -98,10 +102,9 @@ public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
 
 		try {
 			Map<String, AbstractObjectWapper<FileObject>> abstractObjectWappers = new HashMap<>();
-			if (exist) {
+			if (isExist()) {
 				Client<FileObject> client = getEndpoint().getRandomClient();
 				// client.list(this.uri);
-
 				FileObject[] fileObjects = client.list(this.uri);
 				// FileObject[] fileObjects = this.object.getChildren();
 				if (fileObjects != null && fileObjects.length > 0) {
@@ -148,15 +151,19 @@ public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
 	}
 
 	@Override
-	public AbstractObjectWapper<FileObject> createChildDir(String srcBaseName) throws FileException {
+	public AbstractObjectWapper<FileObject> createChild(String srcBaseName, boolean isDir) throws FileException {
 		FileObject newChild;
 		try {
 			newChild = this.getObject().resolveFile(srcBaseName);
 
 			VfsObjectWapper objectWapper = new VfsObjectWapper(newChild, getEndpoint());
-			objectWapper.setDirectory(true);
-			objectWapper.setExist(false);
-			return objectWapper;
+			objectWapper.setExist(newChild.exists());
+			FileType type = newChild.getType();
+			if (FileType.IMAGINARY.equals(type) || FileType.FOLDER.equals(type) == isDir) {
+				objectWapper.setDirectory(isDir);
+				return objectWapper;
+			}
+			throw new FileException("Target object type is not match");
 		} catch (FileSystemException e) {
 			throw new FileException();
 		}
@@ -173,6 +180,15 @@ public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
 	protected long doGetLastMod() throws FileException {
 		try {
 			return this.getObject().getContent().getLastModifiedTime();
+		} catch (FileSystemException | FileException e) {
+			throw new FileException();
+		}
+	}
+
+	@Override
+	protected Boolean doCheckExist() throws FileException {
+		try {
+			return this.doGetObject().exists();
 		} catch (FileSystemException | FileException e) {
 			throw new FileException();
 		}

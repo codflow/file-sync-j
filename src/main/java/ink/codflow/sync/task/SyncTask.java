@@ -1,7 +1,9 @@
 package ink.codflow.sync.task;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,11 @@ public class SyncTask implements Runnable {
 
 	private static final Logger log = LoggerFactory.getLogger(SyncTask.class);
 
+	final static Map<FileSyncMode, WorkerHandler> handlerMap = new HashMap<FileSyncMode, WorkerHandler>();
+	static {
+		handlerMap.put(FileSyncMode.FILE_INC, new IncreaseFileWorkerHandler());
+	}
+
 	ClientEndpoint<?> srcEndpoint;
 	ClientEndpoint<?> distEndpoint;
 	List<LinkWorker> workerList = new ArrayList<LinkWorker>();
@@ -27,7 +34,7 @@ public class SyncTask implements Runnable {
 	FileSyncMode mode;
 
 	List<ObjectBO> selectedObjects;
-	
+
 	String traceId;
 
 	public ClientEndpoint<?> getSrcEndpoint() {
@@ -67,7 +74,7 @@ public class SyncTask implements Runnable {
 				doRunATask(this);
 			}
 		} catch (Exception e) {
-			log.error("tasl error", e);
+			log.error("task error", e);
 		}
 	}
 
@@ -77,19 +84,49 @@ public class SyncTask implements Runnable {
 
 			List<ObjectBO> objectUriBOs = task.selectedObjects;
 			if (objectUriBOs != null && !objectUriBOs.isEmpty()) {
-				for (ObjectBO objectUriBO : objectUriBOs) {
-					String srcUri = objectUriBO.getUri();
-					AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(srcUri);
-					AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(srcUri);
+				ArrayList<SimpleObject> simpleObjects = new ArrayList<SimpleObject>();
 
-					LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
-					task.workerList.add(linkWorker);
-
-				}
-			} else {
 				AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
 				AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
+				SelectedLinkWorker linkWorker = new SelectedLinkWorker(srcObject, destObject, simpleObjects);
+
+				for (ObjectBO objectBO : objectUriBOs) {
+
+					String uri = objectBO.getUri();
+					boolean file = objectBO.isFile();
+
+					SimpleObject simpleObject = new SimpleObject();
+					simpleObject.setDir(!file);
+					simpleObject.setPath(uri);
+					simpleObjects.add(simpleObject);
+				}
+				FileSyncMode mode0 = task.getMode();
+				WorkerHandler handler = getHandler(mode0);
+				linkWorker.setWorkerHandler(handler);
+				task.workerList.add(linkWorker);
+
+//					String srcUri = objectUriBO.getUri();
+//					AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(srcUri);
+//					AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(srcUri);
+//
+//					LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
+//
+//					FileSyncMode mode0 = task.getMode();
+//
+//					WorkerHandler handler = getHandler(mode0);
+//
+//					linkWorker.setWorkerHandler(handler);
+//					task.workerList.add(linkWorker);
+
+			} else {
+
+				AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
+				AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
+
 				LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
+				FileSyncMode mode0 = task.getMode();
+				WorkerHandler handler = getHandler(mode0);
+				linkWorker.setWorkerHandler(handler);
 				task.workerList.add(linkWorker);
 
 			}
@@ -105,6 +142,10 @@ public class SyncTask implements Runnable {
 			log.error("task error", e);
 		}
 
+	}
+
+	WorkerHandler getHandler(FileSyncMode mode) {
+		return handlerMap.get(mode);
 	}
 
 	public SyncProgress getSyncProgressView() {
@@ -172,7 +213,13 @@ public class SyncTask implements Runnable {
 	public void setMode(FileSyncMode mode) {
 		this.mode = mode;
 	}
-	
-	
+
+	public List<ObjectBO> getSelectedObjects() {
+		return selectedObjects;
+	}
+
+	public void setSelectedObjects(List<ObjectBO> selectedObjects) {
+		this.selectedObjects = selectedObjects;
+	}
 
 }

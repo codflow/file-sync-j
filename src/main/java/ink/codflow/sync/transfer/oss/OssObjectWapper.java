@@ -18,12 +18,12 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 
 	private static final Logger log = LoggerFactory.getLogger(OssObjectWapper.class);
 
-	static final ObjectAdapter<OssObject> OBJECT_ADAPTER = new OssObjectAdapter();
-	
-	public OssObjectWapper(String uri){
-		super(uri,null);
+	static final OssObjectAdapter OBJECT_ADAPTER = new OssObjectAdapter();
+
+	public OssObjectWapper(String uri) {
+		super(uri, null);
 	}
-	
+
 	public OssObjectWapper(String root, ClientEndpoint<OssObject> endpoint) {
 		super(root, endpoint);
 	}
@@ -43,7 +43,9 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 
 	@Override
 	protected boolean doIsDir() throws FileException {
-		return OBJECT_ADAPTER.isDir(getObject());
+		String uri = getUri();
+		return '/' == uri.charAt(uri.length() - 1);
+		// return OBJECT_ADAPTER.isDir(getObject());
 	}
 
 	@Override
@@ -66,25 +68,20 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 		OssObject[] childrens = client.list(getUri());
 		for (OssObject ossObject : childrens) {
 			OssObjectWapper wapper = new OssObjectWapper(ossObject, getEndpoint());
-			abstractObjectWappers.put(getBaseFileName(), wapper);
+			wapper.setUri(ossObject.getUri());
+			abstractObjectWappers.put(wapper.getBaseFileName(), wapper);
 		}
 		return abstractObjectWappers;
 	}
 
 	@Override
 	protected String doGetUri() throws FileException {
-		return getObject().getUri();
+		return getUri();
 	}
 
 	@Override
 	protected String doGetBaseName() throws FileException {
-		String key = getObject().getKey();
-		int index = key.lastIndexOf('/');
-		if (index == key.length() - 1) {
-			index = key.lastIndexOf('/', key.length() - 2);
-			return key.substring(index, key.length() - 1);
-		}
-		return key.substring(index, key.length());
+		return OBJECT_ADAPTER.getBaseFileName(getUri());
 	}
 
 	@Override
@@ -94,21 +91,20 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 	}
 
 	@Override
-	public AbstractObjectWapper<OssObject> createChildDir(String srcBaseName) throws FileException {
+	public AbstractObjectWapper<OssObject> createChild(String srcBaseName,boolean isDir) throws FileException {
 		OssObject object = new OssObject();
 		OssObject obj0 = getObject();
-		String bucket0 = obj0.getBucket();
-		String key0 =  obj0.getKey();
+		String bucket0 = obj0.getBucketName();
+		String key0 = obj0.getKey();
 		object.setOss(obj0.getOss());
-		object.setKey(key0+srcBaseName+"/");
-		object.setBucket(bucket0);
-		// TODO
-		object.setUri(getUri() + srcBaseName+"/");
-		
+		object.setKey(key0.isEmpty()?srcBaseName + "/":key0 + srcBaseName + "/");
+		object.setBucketName(bucket0);
+		String uri = isDir?  getUri() + srcBaseName + "/" :  getUri() + srcBaseName ;
+		object.setUri(uri);
 		OssObjectWapper objectWapper = new OssObjectWapper(object, getEndpoint());
-		objectWapper.setDirectory(true);
+		objectWapper.setUri(uri);
+		objectWapper.setDirectory(isDir);
 		objectWapper.setExist(false);
-		
 		return objectWapper;
 	}
 
@@ -118,7 +114,6 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 		return client.resolve(getUri());
 	}
 
-
 	@Override
 	protected long doGetLastMod() throws FileException {
 		return this.getObject().getLastModified().getTime();
@@ -127,8 +122,15 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 	@Override
 	public void copyFrom(AbstractObjectWapper<?> objectWapper) throws FileException {
 		doCopyFromWithTimeStamp(objectWapper);
+
+	}
+
+	@Override
+	protected Boolean doCheckExist() throws FileException {
+
+		OssObject object = this.doGetObject();
+		return OBJECT_ADAPTER.checkExist(object);
 		
 	}
-	
 
 }

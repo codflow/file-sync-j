@@ -2,7 +2,6 @@ package ink.codflow.sync.api.command;
 
 import org.apache.commons.vfs2.FileObject;
 
-import ink.codflow.sync.core.VfsSynchronzer;
 import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.exception.SecurityInitFailureException;
 import ink.codflow.sync.security.LocalSecurityManager;
@@ -32,8 +31,8 @@ public class CommandApi {
             FileObject srcObject = sftpClient.resolve(srcPath);
 
             FileObject distObject = localClient.resolve(localDstPath);
-            VfsSynchronzer syncer = new VfsSynchronzer();
-            syncer.syncIncreaseFile(srcObject, distObject);
+//            VfsSynchronzer syncer = new VfsSynchronzer();
+//            syncer.syncIncreaseFile(srcObject, distObject);
 
         } catch (Error e) {
             e.printStackTrace();

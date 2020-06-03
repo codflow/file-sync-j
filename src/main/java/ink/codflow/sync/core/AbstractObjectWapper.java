@@ -22,7 +22,7 @@ public abstract class AbstractObjectWapper<T> {
 
 	}
 
-	protected boolean exist = true;
+	protected Boolean exist = null;
 
 	protected String uri;
 
@@ -155,11 +155,19 @@ public abstract class AbstractObjectWapper<T> {
 
 	protected abstract long doGetLastMod() throws FileException;
 
-	public boolean isExist() {
-		return exist;
+	public boolean isExist() throws FileException {
+		if (this.exist != null) {
+			return this.exist;
+		}
+		Boolean exist0 = doCheckExist();
+		this.exist = exist0;
+		return exist0;
+		
 	}
 
-	public void setExist(boolean exist) {
+	protected abstract Boolean doCheckExist() throws FileException;
+
+	public void setExist(Boolean exist) {
 		this.exist = exist;
 	}
 	
@@ -194,7 +202,7 @@ public abstract class AbstractObjectWapper<T> {
 
 	protected abstract long doGetSize() throws FileException;
 
-	public abstract AbstractObjectWapper<T> createChildDir(String srcBaseName) throws FileException;
+	public abstract AbstractObjectWapper<T> createChild(String srcBaseName,boolean isDir) throws FileException;
 
 	public abstract T doGetObject() throws FileException;
 

@@ -68,6 +68,7 @@ public class SyncTaskConductor {
 		syncTask.setDistEndpoint(dstEndpoint);
 		syncTask.setSrcEndpoint(srcEndpoint);
 		syncTask.setMode(mode != null ? mode : FileSyncMode.SYNC);
+		syncTask.setSelectedObjects(selectedObjects);
 		return syncTask;
 	}
 

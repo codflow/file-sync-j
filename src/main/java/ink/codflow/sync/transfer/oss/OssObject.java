@@ -7,6 +7,8 @@ import com.aliyun.oss.model.OSSObject;
 
 public class OssObject {
 
+	boolean bucket = false;
+	
 	OSS oss;
 
 	private OSSObject realObject;
@@ -14,7 +16,7 @@ public class OssObject {
 	private long size;
 	private Date lastModified;
 	private String eTag;
-	private String bucket;
+	private String bucketName;
 	private String key;
 	private String uri;
 
@@ -66,12 +68,12 @@ public class OssObject {
 		this.uri = uri;
 	}
 
-	public String getBucket() {
-		return bucket;
+	public String getBucketName() {
+		return bucketName;
 	}
 
-	public void setBucket(String bucket) {
-		this.bucket = bucket;
+	public void setBucketName(String bucket) {
+		this.bucketName = bucket;
 	}
 
 	public String getKey() {
@@ -82,4 +84,6 @@ public class OssObject {
 		this.key = key;
 	}
 
+	
+	
 }

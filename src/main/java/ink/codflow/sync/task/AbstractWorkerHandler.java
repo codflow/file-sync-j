@@ -3,6 +3,7 @@ package ink.codflow.sync.task;
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.exception.FileException;
+import ink.codflow.sync.task.LinkWorker.AnalyseListener;
 import ink.codflow.sync.task.LinkWorker.CopyListener;
 
 public abstract class AbstractWorkerHandler implements WorkerHandler {
@@ -13,6 +14,15 @@ public abstract class AbstractWorkerHandler implements WorkerHandler {
 		if (copyListener != null) {
 			copyListener.doRecord(srcObject);
 		}
+	}
+	
+	protected long countSize(AbstractObjectWapper<?> srcElement, AnalyseListener listener) throws FileException {
+		long size = countSize(srcElement);
+		if (listener != null) {
+			listener.doRecord(srcElement);
+
+		}
+		return size;
 	}
 
 	protected boolean isDiffFile(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject)

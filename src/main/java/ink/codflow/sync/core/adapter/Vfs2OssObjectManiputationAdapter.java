@@ -38,8 +38,8 @@ public class Vfs2OssObjectManiputationAdapter implements ObjectManipulationAdapt
 			} else {
 				copyFileToFile(src, dest);
 			}
-		}
-		if (vfsObjectAdapter.isDir(src) || ossObjectAdapter.isDir(dest)) {
+			return;
+		}else if (vfsObjectAdapter.isDir(src) && ossObjectAdapter.isDir(dest)) {
 			copyDirToDir(src, dest);
 
 		} else {
@@ -50,7 +50,7 @@ public class Vfs2OssObjectManiputationAdapter implements ObjectManipulationAdapt
 
 	@Override
 	public void copyFileToFile(FileObject srcFile, OssObject destFile) throws FileException {
-		String bucket = destFile.getBucket();
+		String bucket = destFile.getBucketName();
 		String key = destFile.getKey();
 		try {
 			InputStream inputStream = srcFile.getContent().getInputStream();
@@ -70,7 +70,7 @@ public class Vfs2OssObjectManiputationAdapter implements ObjectManipulationAdapt
 
 	@Override
 	public void copyFileToDir(FileObject srcFile, OssObject destDir) throws FileException {
-		String bucket = destDir.getBucket();
+		String bucket = destDir.getBucketName();
 		String key = destDir.getKey();
 		String baseName = srcFile.getName().getBaseName();
 		try {
@@ -88,8 +88,10 @@ public class Vfs2OssObjectManiputationAdapter implements ObjectManipulationAdapt
 			FileObject[] srcFileObjects = srcDir.getChildren();
 			if (srcFileObjects != null && srcFileObjects.length > 0) {
 				for (FileObject fileObject : srcFileObjects) {
-					if (ossObjectAdapter.isDir(destDir)) {
-
+					if (vfsObjectAdapter.isDir(fileObject)) {
+						String baseName = fileObject.getName().getBaseName();
+						OssObject childOnObject = createChildObject(destDir, baseName);
+						copyDirToDir(fileObject, childOnObject);
 					} else {
 						copyFileToDir(fileObject, destDir);
 					}
@@ -100,7 +102,7 @@ public class Vfs2OssObjectManiputationAdapter implements ObjectManipulationAdapt
 				String key = destDir.getKey();
 				String key0 = new StringBuilder(key).append(baseName).toString();
 
-				String bucket = destDir.getBucket();
+				String bucket = destDir.getBucketName();
 				OSS oss = destDir.getOss();
 
 				createOssDir(bucket, key0, oss);
@@ -111,11 +113,28 @@ public class Vfs2OssObjectManiputationAdapter implements ObjectManipulationAdapt
 		}
 	}
 
+	OssObject createChildObject(OssObject parent, String baseName) {
+		String bucketName0 = parent.getBucketName();
+		String key0 = parent.getKey();
+		OSS client = parent.getOss();
+		String uri0 = parent.getUri();
+
+		String key = key0 !=null && !key0.isEmpty() ?key0 + baseName + "/":baseName + "/";
+		String uri = uri0 + baseName + "/";
+		OssObject ossObject = new OssObject();
+		ossObject.setBucketName(bucketName0);
+		ossObject.setKey(key);
+		ossObject.setOss(client);
+		ossObject.setUri(uri);
+		return ossObject;
+
+	}
+
 	void createOssDir(String bucket, String key, OSS oss) throws FileException {
 		OssObject object = new OssObject();
 		object.setOss(oss);
 		object.setKey(key);
-		object.setBucket(bucket);
+		object.setBucketName(bucket);
 		// TODO
 		object.setUri(bucket + "/" + key);
 		ossObjectAdapter.createDir(object);

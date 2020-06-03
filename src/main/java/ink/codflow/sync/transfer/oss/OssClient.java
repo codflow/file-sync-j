@@ -16,6 +16,8 @@ import ink.codflow.sync.transfer.Client;
 
 public class OssClient implements Client<OssObject> {
 
+	static final String EMPTY_KEY = "";
+	
 	OssAuthentication authentication;
 
 	OSS client;
@@ -35,7 +37,7 @@ public class OssClient implements Client<OssObject> {
 		int index = path.indexOf("/",1);
 				
 		String bucketName = path.substring(1, index);
-		String keyPrefix = path.substring(index,path.length()-1);
+		String keyPrefix = path.substring(index+1);
 		ObjectListing list = client.listObjects(bucketName, keyPrefix);
 		List<OSSObjectSummary> lObjectSummaries = list.getObjectSummaries();
 
@@ -44,11 +46,16 @@ public class OssClient implements Client<OssObject> {
 			String eTag = ossObjectSummary.getETag();
 			Date lastMod = ossObjectSummary.getLastModified();
 			long size = ossObjectSummary.getSize();
+			String key = ossObjectSummary.getKey();
+			String bucket = ossObjectSummary.getBucketName();
 			OssObject ossObject = new OssObject();
+			ossObject.setBucketName(bucket);
+			ossObject.setKey(key);
 			ossObject.seteTag(eTag);
 			ossObject.setLastModified(lastMod);
 			ossObject.setSize(size);
 			ossObject.setOss(client);
+			ossObject.setUri("/"+bucket+"/"+key);
 			ossObjectList.add(ossObject);
 		}
 		return ossObjectList.toArray(new OssObject[0]);
@@ -57,10 +64,18 @@ public class OssClient implements Client<OssObject> {
 	@Override
 	public OssObject resolve(String path) throws FileException {
 
-		int index = path.indexOf("/");
-		String bucketName = path.substring(0, index);
-		String key = path.substring(index);
-
+		int index = path.indexOf("/",1);
+		String bucketName = path.substring(1, index);
+		String key = index<path.length() ? path.substring(index+1):EMPTY_KEY;
+		if (EMPTY_KEY.equals(key)) {
+			OssObject ossObject = new OssObject();
+			ossObject.setBucketName(bucketName);
+			ossObject.setUri(path);
+			ossObject.setOss(client);
+			ossObject.setKey("");
+			return ossObject;
+			
+		}
 		SimplifiedObjectMeta meta = client.getSimplifiedObjectMeta(bucketName, key);
 
 		long size = meta.getSize();
@@ -69,6 +84,9 @@ public class OssClient implements Client<OssObject> {
 		OssObject ossObject = new OssObject();
 		ossObject.seteTag(eTag);
 		ossObject.setLastModified(lastMod);
+		ossObject.setBucketName(bucketName);
+		ossObject.setKey(key);
+		
 		ossObject.setSize(size);
 		ossObject.setOss(client);
 		return ossObject;

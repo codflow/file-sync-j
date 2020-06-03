@@ -1,14 +1,12 @@
 package ink.codflow.sync.task;
 
-
-
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.SyncProgress;
 import ink.codflow.sync.exception.FileException;
 
 public class LinkWorker {
 
-	IncreaseFileWorkerHandler workerHandler;
+	WorkerHandler workerHandler;
 
 	SyncProgress progress = new SyncProgress();
 
@@ -48,12 +46,10 @@ public class LinkWorker {
 		return progress;
 	}
 
-	public long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
-		return workerHandler.doAnalyse(srcObject, destObject);
+	protected long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
+		return workerHandler.doAnalyse(srcObject, destObject,new AnalyseListener());
 
 	}
-
-
 
 	public SyncProgress sync(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
 		if (srcObject == null) {
@@ -68,21 +64,22 @@ public class LinkWorker {
 
 	// src object type: dir,file ;dest object type: dir,file
 	protected void doSync(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
-		workerHandler.doSync(srcObject, destObject);
+		workerHandler.doSync(srcObject, destObject, new CopyListener());
 	}
 
-	void doCopy(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) throws FileException {
-		doRecord();
-		destObject.copyFrom(srcObject);
-	}
+ 
 
 	class CopyListener {
 
 		public void doRecord(AbstractObjectWapper<?> srcObject) throws FileException {
+			if (srcObject.isFile()) {
+				long size = srcObject.getSize();
+				recordSyncedFileSize(size);
+				recordSyncedFileCount();
+			}else {
+				System.err.println("ignore record :"+srcObject.getBaseFileName() );
+			}
 
-			long size = srcObject.getSize();
-			recordSyncedFileSize(size);
-			recordSyncedFileCount();
 		}
 
 		void recordSyncedFileSize(long size) {
@@ -93,19 +90,33 @@ public class LinkWorker {
 			progress.increaseSyncedFileCount();
 		}
 	}
-	
-	
-	class AnalyseListener{
-		
-		
+
+	class AnalyseListener {
+
+		public void doRecord(AbstractObjectWapper<?> srcObject) throws FileException {
+
+			long size = srcObject.getSize();
+			recordAnalyseFileSize(size);
+			recordAnalyseFileCount();
+		}
+
+		void recordAnalyseFileSize(long size) {
+			progress.addAnalyseSize(size);
+		}
+
+		void recordAnalyseFileCount() {
+			progress.increaseAnalyseFileCount();
+		}
+
 	}
-	
 
 	private void doRecord() {
 
 		// TODO Auto-generated method stub
 
 	}
+	
+	
 
 	void recordAnalyseFileSize(long size) {
 		this.progress.addAnalyseSize(size);
@@ -125,6 +136,10 @@ public class LinkWorker {
 
 	public SyncProgress getProgress() {
 		return progress;
+	}
+
+	public void setWorkerHandler(WorkerHandler workerHandler) {
+		this.workerHandler = workerHandler;
 	}
 
 }

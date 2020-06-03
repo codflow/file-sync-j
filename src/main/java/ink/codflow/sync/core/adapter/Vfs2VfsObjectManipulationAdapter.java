@@ -30,7 +30,7 @@ public class Vfs2VfsObjectManipulationAdapter implements ObjectManipulationAdapt
 		}
 		if (FileType.FILE.equals(srcType)) {
 
-			if (FileType.FILE.equals(destType)) {
+			if (FileType.FILE.equals(destType)||FileType.IMAGINARY.equals(destType)) {
 				copyFileToFile(src, dest);
 
 			} else if (FileType.FOLDER.equals(destType)) {
