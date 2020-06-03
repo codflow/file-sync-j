@@ -45,12 +45,12 @@ public class FileSyncManager {
 		return conductor.createSyncTask(taskBO);
 	}
 
-	public void launchTask(SyncTask task) {
-		conductor.launch(task);
+	public String launchTask(SyncTask task) {
+		return conductor.launch(task);
 	}
 
 	public boolean testClient(ClientEndpointBO endpoint) {
-
+	    endpoint.setId(-1);
 		ClientEndpoint<?> clientEndpoint = conductor.getEndpoint(endpoint, true);
 		AbstractObjectWapper<?> object = clientEndpoint.resolveRelatively("");
 		try {

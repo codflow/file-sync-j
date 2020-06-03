@@ -35,7 +35,7 @@ public class SyncTask implements Runnable {
 
 	List<ObjectBO> selectedObjects;
 
-	String traceId;
+	String id;
 
 	public ClientEndpoint<?> getSrcEndpoint() {
 		return srcEndpoint;
@@ -105,18 +105,7 @@ public class SyncTask implements Runnable {
 				linkWorker.setWorkerHandler(handler);
 				task.workerList.add(linkWorker);
 
-//					String srcUri = objectUriBO.getUri();
-//					AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(srcUri);
-//					AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(srcUri);
-//
-//					LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
-//
-//					FileSyncMode mode0 = task.getMode();
-//
-//					WorkerHandler handler = getHandler(mode0);
-//
-//					linkWorker.setWorkerHandler(handler);
-//					task.workerList.add(linkWorker);
+
 
 			} else {
 
@@ -222,4 +211,14 @@ public class SyncTask implements Runnable {
 		this.selectedObjects = selectedObjects;
 	}
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+ 
+	
 }
