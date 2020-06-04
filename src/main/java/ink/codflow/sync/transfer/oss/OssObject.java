@@ -7,13 +7,15 @@ import com.aliyun.oss.model.OSSObject;
 
 public class OssObject {
 
-	boolean bucket = false;
+	public OssObject(){
+		
+	}
 	
 	OSS oss;
 
 	private OSSObject realObject;
 
-	private long size;
+	private Long size;
 	private Date lastModified;
 	private String eTag;
 	private String bucketName;
@@ -85,5 +87,8 @@ public class OssObject {
 	}
 
 	
+	void lazyLoad() {
+		
+	}
 	
 }

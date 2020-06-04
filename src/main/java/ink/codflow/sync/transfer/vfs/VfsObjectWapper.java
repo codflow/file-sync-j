@@ -130,8 +130,8 @@ public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
 	@Override
 	public boolean isDiff(AbstractObjectWapper<?> abstractObjectWapper) throws FileException {
 
-		Object srcObject = abstractObjectWapper.getObject();
-		Object destObject = this.getObject();
+		Object  destObject= abstractObjectWapper.getObject();
+		Object  srcObject= this.getObject();
 		
 		@SuppressWarnings("rawtypes")
 		ObjectManipulationAdapter adapter =getObjectManipulationAdapter(srcObject.getClass(), destObject.getClass());

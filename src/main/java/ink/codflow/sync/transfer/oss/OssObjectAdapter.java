@@ -3,6 +3,8 @@ package ink.codflow.sync.transfer.oss;
 import java.io.ByteArrayInputStream;
 
 import com.aliyun.oss.OSS;
+import com.aliyun.oss.model.ListObjectsRequest;
+import com.aliyun.oss.model.ObjectListing;
 
 import ink.codflow.sync.core.adapter.ObjectAdapter;
 import ink.codflow.sync.exception.FileException;
@@ -14,14 +16,14 @@ public class OssObjectAdapter implements ObjectAdapter<OssObject> {
 	@Override
 	public boolean isFile(OssObject object) throws FileException {
 
-		long size = object.getSize();
 		String key = object.getKey();
+
 		if (key != null && !key.isEmpty()) {
 			char lastChar = key.charAt(key.length() - 1);
-			return !((size == 0) && SP_CHAR == lastChar);
+			return !(SP_CHAR == lastChar && (object.getSize() == 0));
 		}
-		return false;
 
+		throw new FileException("key is not exist");
 	}
 
 	@Override
@@ -35,13 +37,11 @@ public class OssObjectAdapter implements ObjectAdapter<OssObject> {
 			String bucketName = object.getBucketName();
 			String key = object.getKey();
 			String keySuffixWithSlash = checkAndModDirKey(key);
-
 			OSS client = object.getOss();
 			client.putObject(bucketName, keySuffixWithSlash, new ByteArrayInputStream(new byte[0]));
 		} catch (Exception e) {
 			throw new FileException(e);
 		}
-
 	}
 
 	public boolean isDir(String uri) {
@@ -50,25 +50,22 @@ public class OssObjectAdapter implements ObjectAdapter<OssObject> {
 		return SP_CHAR == lastChar;
 	}
 
-	public String getBucketName(String uri) {
-
-		int bktSlashIndex = uri.indexOf('/', 1);
-		String bucketName = uri.substring(1, bktSlashIndex);
-		return bucketName;
-	}
+//	public String getBucketName(String uri) {
+//
+//		int bktSlashIndex = uri.indexOf('/', 1);
+//		String bucketName = uri.substring(1, bktSlashIndex);
+//		return bucketName;
+//	}
 
 	public String getKey(String uri) {
 
-		int bktSlashIndex = uri.indexOf('/', 1);
-		String key = bktSlashIndex < uri.length() - 1 ? uri.substring(bktSlashIndex + 1) : null;
-
-		return key;
+		return uri.substring(1);
 	}
 
 	public String getBaseFileName(String uri) {
 
 		int length = uri.length();
-		if (!isDir(uri)) {
+		if (isDir(uri)) {
 			int preNameSlashIndex = lastIndexOfChar(uri, '/', 1);
 			return uri.substring(preNameSlashIndex + 1, length - 1);
 		} else {
@@ -98,12 +95,28 @@ public class OssObjectAdapter implements ObjectAdapter<OssObject> {
 	}
 
 	public boolean checkExist(OssObject object) {
-		
-		//TODO get summary and cache
+
+		// TODO get summary and cache
 		String key = object.getKey();
 		String bucketName = object.getBucketName();
-		
-		return object.getOss().doesObjectExist(bucketName, key);
+		object.getOss().listObjects(bucketName, key);
+		return key.isEmpty() ? object.getOss().doesBucketExist(bucketName)
+				: object.getOss().doesObjectExist(bucketName, key) || checkDirChildExist(object);
+	}
+
+	protected boolean checkDirChildExist(OssObject object) {
+		String key = object.getKey();
+		if (key.charAt(key.length() - 1) == SP_CHAR) {
+			String bucketName = object.getBucketName();
+			ListObjectsRequest listObjectsRequest = new ListObjectsRequest(bucketName);
+			listObjectsRequest.setDelimiter("/");
+			listObjectsRequest.setPrefix(key);
+			ObjectListing list = object.getOss().listObjects(listObjectsRequest);
+			return !(list.getObjectSummaries().isEmpty() && list.getCommonPrefixes().isEmpty());
+		}else {
+			return false;
+		}
+
 	}
 
 }

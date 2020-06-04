@@ -18,7 +18,7 @@ import ink.codflow.sync.core.ClientEndpointPool;
 import ink.codflow.sync.util.IdGen;
 
 public class SyncTaskConductor {
-    int maxThreadSize = 100;
+    int maxThreadSize = 20;
 
     ExecutorService pool = new ThreadPoolExecutor(10, maxThreadSize, 2000, TimeUnit.MILLISECONDS,
             new LinkedBlockingDeque<>());

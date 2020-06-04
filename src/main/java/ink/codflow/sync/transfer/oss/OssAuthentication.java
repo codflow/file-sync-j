@@ -5,7 +5,7 @@ public class OssAuthentication {
 	String endpoint;
 	String accessKeyId;
 	String accessKeySecret;
-	
+	String bucketName;
 	
 	public String getEndpoint() {
 		return endpoint;
@@ -24,6 +24,12 @@ public class OssAuthentication {
 	}
 	public void setAccessKeySecret(String accessKeySecret) {
 		this.accessKeySecret = accessKeySecret;
+	}
+	public String getBucketName() {
+		return bucketName;
+	}
+	public void setBucketName(String bucketName) {
+		this.bucketName = bucketName;
 	}
 	
 	

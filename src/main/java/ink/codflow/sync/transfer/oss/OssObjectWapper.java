@@ -76,7 +76,7 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 
 	@Override
 	protected String doGetUri() throws FileException {
-		return getUri();
+		return getObject().getUri();
 	}
 
 	@Override
@@ -93,18 +93,27 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 	@Override
 	public AbstractObjectWapper<OssObject> createChild(String srcBaseName,boolean isDir) throws FileException {
 		OssObject object = new OssObject();
+		if (isDir) {
+			object.setSize(0);
+		}
 		OssObject obj0 = getObject();
 		String bucket0 = obj0.getBucketName();
 		String key0 = obj0.getKey();
 		object.setOss(obj0.getOss());
-		object.setKey(key0.isEmpty()?srcBaseName + "/":key0 + srcBaseName + "/");
+		
+		StringBuilder keySB = new StringBuilder(key0).append(srcBaseName);
+		
+		if (isDir) {
+			keySB.append("/");
+		}
+		object.setKey(keySB.toString());
 		object.setBucketName(bucket0);
 		String uri = isDir?  getUri() + srcBaseName + "/" :  getUri() + srcBaseName ;
 		object.setUri(uri);
 		OssObjectWapper objectWapper = new OssObjectWapper(object, getEndpoint());
 		objectWapper.setUri(uri);
 		objectWapper.setDirectory(isDir);
-		objectWapper.setExist(false);
+		objectWapper.setExist(null);
 		return objectWapper;
 	}
 
@@ -128,7 +137,7 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 	@Override
 	protected Boolean doCheckExist() throws FileException {
 
-		OssObject object = this.doGetObject();
+		OssObject object = this.getObject();
 		return OBJECT_ADAPTER.checkExist(object);
 		
 	}

@@ -9,6 +9,8 @@ public enum AuthDataType {
     AK,
 
     SK,
+    
+    BKT,
 
     HOST,
 

@@ -66,10 +66,12 @@ public class ClientEndpointPool {
 		String endpoint = ossAuth.getParam(AuthDataType.HOST);
 		String ak = ossAuth.getParam(AuthDataType.AK);
 		String sk = ossAuth.getParam(AuthDataType.SK);
+		String bucketName = ossAuth.getParam(AuthDataType.BKT);
 		OssAuthentication authentication = new OssAuthentication();
 		authentication.setAccessKeyId(ak);
 		authentication.setAccessKeySecret(sk);
 		authentication.setEndpoint(endpoint);
+		authentication.setBucketName(bucketName);
 		OssClient client = new OssClient(authentication);
 		return client;
 	}

@@ -14,7 +14,7 @@ public interface Client<T> {
     public boolean isRemote();
 
 
-	public AbstractObjectWapper<T> resolveWapper(String uri);
+	public AbstractObjectWapper<T> resolveWapper(String path);
 
 	
 }
