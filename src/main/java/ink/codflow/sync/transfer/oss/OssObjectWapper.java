@@ -142,4 +142,11 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 		
 	}
 
+    @Override
+    public void remove() throws FileException {
+        OssObject object = this.getObject();
+        OBJECT_ADAPTER.remove(object);
+        
+    }
+
 }

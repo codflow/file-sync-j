@@ -2,94 +2,107 @@ package ink.codflow.sync.core;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import ink.codflow.sync.consts.SyncStatus;
+import ink.codflow.sync.consts.SyncStatusEnum;
 
 public class SyncProgress {
 
-	private volatile SyncStatus status;
+    private volatile SyncStatusEnum status;
 
-	AtomicLong syncedSize;
+    AtomicLong totalDestSize;
 
-	AtomicLong analyseSize;
+    AtomicLong syncedSize;
 
-	AtomicLong syncedFileCount;
+    AtomicLong analyseSize;
 
-	AtomicLong analyseFileCount;
+    AtomicLong syncedFileCount;
 
-	String message;
+    AtomicLong analyseFileCount;
 
-	public SyncProgress() {
+    String message;
 
-		syncedSize = new AtomicLong();
-		analyseSize = new AtomicLong();
-		syncedFileCount = new AtomicLong();
-		analyseFileCount = new AtomicLong();
-	}
+    public SyncProgress() {
 
-	public SyncProgress(long syncedSize, long analyseSize, long syncedFileCount, long analyseFileCount) {
+        totalDestSize = new AtomicLong();
+        syncedSize = new AtomicLong();
+        analyseSize = new AtomicLong();
+        syncedFileCount = new AtomicLong();
+        analyseFileCount = new AtomicLong();
+    }
 
-		this.analyseFileCount = new AtomicLong(syncedSize);
-		this.analyseSize = new AtomicLong(analyseSize);
-		this.syncedFileCount = new AtomicLong(syncedFileCount);
-		this.analyseFileCount = new AtomicLong(analyseFileCount);
+    public SyncProgress(long syncedSize, long analyseSize, long syncedFileCount, long analyseFileCount,long totalDestSize) {
 
-	}
+        this.analyseFileCount = new AtomicLong(syncedSize);
+        this.analyseSize = new AtomicLong(analyseSize);
+        this.syncedFileCount = new AtomicLong(syncedFileCount);
+        this.analyseFileCount = new AtomicLong(analyseFileCount);
+        
+        this.totalDestSize = new AtomicLong(totalDestSize);
 
-	public long getSyncedSize() {
-		return syncedSize.get();
-	}
+        
 
-	public long getAnalyseSize() {
-		return analyseSize.get();
-	}
+    }
 
-	public long getSyncedFileCount() {
-		return syncedFileCount.get();
-	}
+    public long getSyncedSize() {
+        return syncedSize.get();
+    }
 
-	public long getAnalyseFileCount() {
-		return analyseFileCount.get();
-	}
+    public long getAnalyseSize() {
+        return analyseSize.get();
+    }
 
-	public long addAnalyseSize(long size) {
-		return analyseSize.addAndGet(size);
-	}
+    public long getSyncedFileCount() {
+        return syncedFileCount.get();
+    }
 
-	public long addSyncedSize(long size) {
-		return syncedSize.addAndGet(size);
-	}
+    public long getAnalyseFileCount() {
+        return analyseFileCount.get();
+    }
 
-	public long addAnalyseFileCount(long size) {
-		return analyseFileCount.addAndGet(size);
-	}
+    public long getTotalDestSize() {
+        return totalDestSize.get();
+    }
 
-	public long addSyncedFileCountSize(long size) {
-		return syncedFileCount.addAndGet(size);
-	}
+    public long addAnalyseSize(long size) {
+        return analyseSize.addAndGet(size);
+    }
 
-	public long increaseAnalyseFileCount() {
-		return analyseFileCount.incrementAndGet();
-	}
+    public long addSyncedSize(long size) {
+        return syncedSize.addAndGet(size);
+    }
 
-	public long increaseSyncedFileCount() {
-		return syncedFileCount.incrementAndGet();
-	}
+    public long addTotalDestSize(long size) {
+        return totalDestSize.addAndGet(size);
+    }
 
-	public void clear() {
-		syncedSize.set(0);
-		analyseSize.set(0);
-		syncedFileCount.set(0);
-		analyseFileCount.set(0);
-	}
+    public long addAnalyseFileCount(long size) {
+        return analyseFileCount.addAndGet(size);
+    }
 
-	public SyncStatus getStatus() {
-		return status;
-	}
+    public long addSyncedFileCountSize(long size) {
+        return syncedFileCount.addAndGet(size);
+    }
 
-	public void setStatus(SyncStatus status) {
-		this.status = status;
-	}
+    public long increaseAnalyseFileCount() {
+        return analyseFileCount.incrementAndGet();
+    }
 
- 
+    public long increaseSyncedFileCount() {
+        return syncedFileCount.incrementAndGet();
+    }
+
+    public void clear() {
+        syncedSize.set(0);
+        analyseSize.set(0);
+        syncedFileCount.set(0);
+        analyseFileCount.set(0);
+    }
+
+    public SyncStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(SyncStatusEnum status) {
+        this.status = status;
+    }
 
 }

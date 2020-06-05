@@ -9,7 +9,6 @@ import ink.codflow.sync.bo.ClientEndpointBO;
 import ink.codflow.sync.bo.LinkBO;
 import ink.codflow.sync.bo.ObjectBO;
 import ink.codflow.sync.bo.TaskBO;
-import ink.codflow.sync.bo.WorkerTaskBO;
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.ClientEndpoint;
@@ -48,7 +47,7 @@ public class FileSyncManager {
 	public String launchTask(SyncTask task) {
 		return conductor.launch(task);
 	}
-
+	
 	public boolean testClient(ClientEndpointBO endpoint) {
 		endpoint.setId(-1);
 		ClientEndpoint<?> clientEndpoint = conductor.getEndpoint(endpoint, true);
@@ -62,4 +61,26 @@ public class FileSyncManager {
 			return false;
 		}
 	}
+	
+	
+
+    public void deleteClient(ClientEndpointBO clientEndpointBO) {
+        clientEndpointBO.getRootPath();
+        ClientEndpoint<?> endpoint = conductor.getEndpoint(clientEndpointBO,true);
+        try {
+            endpoint.resolve("").remove();
+        } catch (FileException e) {
+            
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+    }
+
+    public boolean checkAndTryCancle(String traceId) {
+        return conductor.checkAndTryCancle( traceId);
+    }
+	
+	
+	
 }

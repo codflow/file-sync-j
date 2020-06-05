@@ -194,4 +194,14 @@ public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
 		}
 	}
 
+    @Override
+    public void remove() throws FileException {
+        FileObject object = this.getObject();
+        try {
+            object.deleteAll();
+        } catch (FileSystemException e) {
+            throw new FileException();
+        }
+    }
+
 }

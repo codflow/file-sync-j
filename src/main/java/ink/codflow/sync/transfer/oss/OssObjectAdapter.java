@@ -119,4 +119,9 @@ public class OssObjectAdapter implements ObjectAdapter<OssObject> {
 
 	}
 
+    public void remove(OssObject object) {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

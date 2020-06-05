@@ -13,6 +13,7 @@ import ink.codflow.sync.bo.ObjectBO;
 import ink.codflow.sync.bo.TaskBO;
 import ink.codflow.sync.bo.WorkerTaskBO;
 import ink.codflow.sync.consts.FileSyncMode;
+import ink.codflow.sync.consts.SyncStatusEnum;
 import ink.codflow.sync.core.ClientEndpoint;
 import ink.codflow.sync.core.ClientEndpointPool;
 import ink.codflow.sync.util.IdGen;
@@ -62,7 +63,6 @@ public class SyncTaskConductor {
 
     public SyncTask createTask(Integer srcEndpointId, Integer dstEndpointId, List<ObjectBO> selectedObjects,
             FileSyncMode mode) {
-
         ClientEndpoint<?> srcEndpoint = clientPool.getEndpoint(srcEndpointId);
         ClientEndpoint<?> dstEndpoint = clientPool.getEndpoint(dstEndpointId);
         return createTask(srcEndpoint, dstEndpoint, selectedObjects, mode);
@@ -81,7 +81,7 @@ public class SyncTaskConductor {
         return syncTask;
     }
 
-    public SyncTask createTask(LinkBO linkBO, List<ObjectBO> objectUriList, FileSyncMode mode) {
+    public SyncTask createTask(LinkBO linkBO, List<ObjectBO> objectList, FileSyncMode mode) {
 
         ClientEndpointBO destEndpointBO = linkBO.getDistEndpoint();
         ClientEndpointBO srcEndpointBO = linkBO.getSrcEndpoint();
@@ -99,7 +99,7 @@ public class SyncTaskConductor {
 
         FileSyncMode mode0 = mode != null ? mode : linkBO.getMode();
         linkBO.getMaxThread();
-        return createTask(srcEndpointId, dstEndpointId, objectUriList, mode0);
+        return createTask(srcEndpointId, dstEndpointId, objectList, mode0);
 
     }
 
@@ -120,6 +120,15 @@ public class SyncTaskConductor {
         }
 
         return task;
+    }
+
+    public boolean checkAndTryCancle(String traceId) {
+        SyncTask task = cacheMap.get(traceId);
+        SyncStatusEnum status = task.getSyncProgressView().getStatus();
+        if (SyncStatusEnum.DONE.equals(status)&& SyncStatusEnum.FAILD.equals(status)) {
+            return true;
+        }
+        return false;
     }
 
 }
