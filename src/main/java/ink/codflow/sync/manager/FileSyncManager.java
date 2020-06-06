@@ -49,7 +49,8 @@ public class FileSyncManager {
 	}
 	
 	public boolean testClient(ClientEndpointBO endpoint) {
-		endpoint.setId(-1);
+
+		//endpoint.setId(-1);
 		ClientEndpoint<?> clientEndpoint = conductor.getEndpoint(endpoint, true);
 		try {
 			AbstractObjectWapper<?> object = clientEndpoint.resolve("/");

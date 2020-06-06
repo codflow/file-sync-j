@@ -10,7 +10,7 @@ import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.task.LinkWorker.AnalyseListener;
-import ink.codflow.sync.task.LinkWorker.CopyListener;
+import ink.codflow.sync.task.LinkWorker.SyncListener;
 
 public class IncreaseFileWorkerHandler extends AbstractWorkerHandler implements WorkerHandler {
 
@@ -26,7 +26,7 @@ public class IncreaseFileWorkerHandler extends AbstractWorkerHandler implements 
 	}
 
 	public void doSync(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject,
-			CopyListener copyListener) {
+			SyncListener copyListener) {
 		try {
 			Map<String, ? extends AbstractObjectWapper<?>> destMap = destObject.isDir() && destObject.isExist() ? destObject.mapChildren()
 					: null;
@@ -47,10 +47,8 @@ public class IncreaseFileWorkerHandler extends AbstractWorkerHandler implements 
 							doCopy(srcElement, destElement, copyListener);
 						} else {
 							AbstractObjectWapper<?> destElement = destObject.createChild(baseName, false);
-
 							doCopy(srcElement, destElement, copyListener);
 						}
-
 					}
 				}
 			} else if (srcObject.isFile()) {
@@ -63,6 +61,7 @@ public class IncreaseFileWorkerHandler extends AbstractWorkerHandler implements 
 				}
 			}
 		} catch (FileException e) {
+			
 			log.error("analyse error", e);
 		}
 	}
@@ -87,6 +86,7 @@ public class IncreaseFileWorkerHandler extends AbstractWorkerHandler implements 
 
 						AbstractObjectWapper<?> destElement = (AbstractObjectWapper<?>) destMap.get(srcBaseName);
 						totalSize += doAnalyse(srcElement, destElement, listener);
+						destMap.remove(srcBaseName);
 					} else {
 						//
 						if (srcElement.isFile()) {
@@ -95,6 +95,9 @@ public class IncreaseFileWorkerHandler extends AbstractWorkerHandler implements 
 						} else {
 							AbstractObjectWapper<?> destElement0 = destObject.createChild(srcBaseName, true);
 							totalSize += doAnalyse(srcElement, destElement0, listener);
+							if (destMap!= null) {
+								destMap.remove(srcBaseName);
+							}
 
 						}
 					}
@@ -107,9 +110,11 @@ public class IncreaseFileWorkerHandler extends AbstractWorkerHandler implements 
 					totalSize += objectSize;
 				}
 			}
+
 		} catch (FileException e) {
 			log.error("analyse error", e);
 		}
+
 		checkAfterAnalyse(srcObject, destObject);
 		return totalSize;
 	}

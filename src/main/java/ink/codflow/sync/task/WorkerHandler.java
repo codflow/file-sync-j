@@ -2,7 +2,7 @@ package ink.codflow.sync.task;
 
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.task.LinkWorker.AnalyseListener;
-import ink.codflow.sync.task.LinkWorker.CopyListener;
+import ink.codflow.sync.task.LinkWorker.SyncListener;
 
 public interface WorkerHandler {
 
@@ -12,6 +12,6 @@ public interface WorkerHandler {
 
 	void doSync(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject);
 
-	void doSync(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject, CopyListener listener);
+	void doSync(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject, SyncListener listener);
 
 }

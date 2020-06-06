@@ -1,10 +1,15 @@
 package ink.codflow.sync.task;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.SyncProgress;
 import ink.codflow.sync.exception.FileException;
 
 public class LinkWorker {
+
+	private static final Logger logger = LoggerFactory.getLogger(LinkWorker.class);
 
 	WorkerHandler workerHandler;
 
@@ -47,7 +52,7 @@ public class LinkWorker {
 	}
 
 	protected long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
-		return workerHandler.doAnalyse(srcObject, destObject,new AnalyseListener());
+		return workerHandler.doAnalyse(srcObject, destObject, new AnalyseListener());
 
 	}
 
@@ -64,22 +69,34 @@ public class LinkWorker {
 
 	// src object type: dir,file ;dest object type: dir,file
 	protected void doSync(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
-		workerHandler.doSync(srcObject, destObject, new CopyListener());
+		workerHandler.doSync(srcObject, destObject, new SyncListener());
 	}
 
- 
+	class SyncListener {
 
-	class CopyListener {
+		long expire;
 
-		public void doRecord(AbstractObjectWapper<?> srcObject) throws FileException {
+		public SyncListener() {
+			
+		}
+
+		public SyncListener(long expire) {
+			this.expire = expire;
+		}
+
+		public boolean doCheckExpired(long targetUnixtime) {
+			long currentUnixtime = System.currentTimeMillis();
+			return currentUnixtime - targetUnixtime > expire*1000;
+		}
+
+		public void doRecordDiff(AbstractObjectWapper<?> srcObject) throws FileException {
 			if (srcObject.isFile()) {
 				long size = srcObject.getSize();
 				recordSyncedFileSize(size);
 				recordSyncedFileCount();
-			}else {
-				System.err.println("ignore record :"+srcObject.getBaseFileName() );
+			} else {
+				logger.warn("ignore record : {}", srcObject.getBaseFileName());
 			}
-
 		}
 
 		void recordSyncedFileSize(long size) {
@@ -89,11 +106,12 @@ public class LinkWorker {
 		void recordSyncedFileCount() {
 			progress.increaseSyncedFileCount();
 		}
+
 	}
 
 	class AnalyseListener {
 
-		public void doRecord(AbstractObjectWapper<?> srcObject) throws FileException {
+		public void doRecordDiff(AbstractObjectWapper<?> srcObject) throws FileException {
 
 			long size = srcObject.getSize();
 			recordAnalyseFileSize(size);
@@ -108,30 +126,6 @@ public class LinkWorker {
 			progress.increaseAnalyseFileCount();
 		}
 
-	}
-
-	private void doRecord() {
-
-		// TODO Auto-generated method stub
-
-	}
-	
-	
-
-	void recordAnalyseFileSize(long size) {
-		this.progress.addAnalyseSize(size);
-	}
-
-	void recordAnalyseFileCount() {
-		this.progress.increaseAnalyseFileCount();
-	}
-
-	void recordSyncedFileSize(long size) {
-		this.progress.addSyncedSize(size);
-	}
-
-	void recordSyncedFileCount() {
-		this.progress.increaseSyncedFileCount();
 	}
 
 	public SyncProgress getProgress() {

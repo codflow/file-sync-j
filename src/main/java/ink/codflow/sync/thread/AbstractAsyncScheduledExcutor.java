@@ -20,7 +20,6 @@ public class AbstractAsyncScheduledExcutor extends AbstractThreadPool {
         String taskId = task.getTaskId();
         taskMap.put(taskId, task);
         return false;
-
     }
 
     class AsynchronousScheduledTaskStateListener {

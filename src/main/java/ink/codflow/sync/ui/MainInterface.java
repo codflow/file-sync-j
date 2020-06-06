@@ -17,10 +17,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import com.aliyun.oss.model.LiveChannelStat.VideoStat;
+
 import ink.codflow.sync.bo.ClientEndpointBO;
 import ink.codflow.sync.bo.LinkBO;
 import ink.codflow.sync.bo.TaskBO;
 import ink.codflow.sync.bo.WorkerTaskBO;
+import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.manager.FileSyncManager;
 import ink.codflow.sync.task.SyncTask;
 
@@ -30,12 +33,14 @@ public class MainInterface {
 
 	Map<String, ClientEndpointBO> map = new HashMap<String, ClientEndpointBO>();
 
+	Map<String, FileSyncMode> modeMap = new HashMap<String, FileSyncMode>();
+
 	JPanel mainpanel;
 	JButton addEndPointBtn;
-
+	JComboBox<String> modeComboBox;
 	JComboBox<String> srcComboBox;
 	JComboBox<String> destComboBox;
-	
+
 	static final AtomicInteger linkIdGenerator = new AtomicInteger(0);
 
 	public MainInterface(FileSyncManager fileSyncManager) {
@@ -51,7 +56,7 @@ public class MainInterface {
 	public void loadMainPanel() {
 
 		JFrame jf = new JFrame("File-Sync-J");
-		jf.setSize(250, 250);
+		jf.setSize(280, 250);
 		jf.setLocationRelativeTo(null);
 		jf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -68,11 +73,20 @@ public class MainInterface {
 			}
 		});
 
+		modeComboBox = new JComboBox<>();
+		loadModeSelector();
+		// modeComboBox.add
+
 		FlowLayout flayout = new FlowLayout();
 		flayout.setAlignment(FlowLayout.CENTER);
+
 		JPanel mpanel = new JPanel(flayout);
 
 		mpanel.add(addEndPointBtn);
+		JLabel modeLabel = new JLabel("Mode:");
+		mpanel.add(modeLabel);
+		mpanel.add(modeComboBox);
+
 		mainpanel.add(mpanel);
 
 		JLabel srcLabel = new JLabel("Source Endpoint:");
@@ -107,9 +121,9 @@ public class MainInterface {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				TaskBO linkBO = createTaskBO();
-				if (linkBO != null) {
-					SyncTask task0 =  fileSyncManager.createSyncTask(linkBO); 
+				TaskBO taskBO = createTaskBO();
+				if (taskBO != null) {
+					SyncTask task0 = fileSyncManager.createSyncTask(taskBO);
 					fileSyncManager.launchTask(task0);
 				}
 			}
@@ -161,6 +175,16 @@ public class MainInterface {
 			updateSelector();
 		}
 
+	}
+
+	void loadModeSelector() {
+
+		this.modeMap.put("INC", FileSyncMode.FILE_INC);
+		this.modeMap.put("SYNC", FileSyncMode.SYNC);
+
+		String[] modes = this.modeMap.keySet().toArray(new String[0]);
+		ComboBoxModel<String> modeModle = new DefaultComboBoxModel<>(modes);
+		modeComboBox.setModel(modeModle);
 	}
 
 	void updateSelector() {
@@ -216,16 +240,22 @@ public class MainInterface {
 	}
 
 	TaskBO createTaskBO() {
-		
+
 		LinkBO linkBO = getSelectLinkBO();
+		FileSyncMode mode = getSelectedMode();
+		linkBO.setMode(mode);
 		WorkerTaskBO workertaskBO = new WorkerTaskBO();
 		workertaskBO.setLinkBO(linkBO);
 		TaskBO taskBO = new TaskBO();
 		taskBO.addWorkerTask(workertaskBO);
 		return taskBO;
 	}
-	
-	
+
+	private FileSyncMode getSelectedMode() {
+		Object mode = this.modeComboBox.getSelectedItem();
+		return this.modeMap.get(mode);
+	}
+
 	int getLinkId() {
 		return linkIdGenerator.getAndIncrement();
 	}

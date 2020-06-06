@@ -11,7 +11,7 @@ public class PairNodeSyncTask implements RunnableFuture<PairSyncResult> {
     
 
     PairNodeSyncTask(ObjectPairNode node) {
-
+    	
     }
 
     @Override

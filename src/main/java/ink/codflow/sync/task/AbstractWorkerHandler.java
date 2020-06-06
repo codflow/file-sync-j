@@ -4,22 +4,22 @@ import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.task.LinkWorker.AnalyseListener;
-import ink.codflow.sync.task.LinkWorker.CopyListener;
+import ink.codflow.sync.task.LinkWorker.SyncListener;
 
 public abstract class AbstractWorkerHandler implements WorkerHandler {
 
 	protected void doCopy(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject,
-			CopyListener copyListener) throws FileException {
+			SyncListener copyListener) throws FileException {
 		destObject.copyFrom(srcObject);
 		if (copyListener != null) {
-			copyListener.doRecord(srcObject);
+			copyListener.doRecordDiff(srcObject);
 		}
 	}
 	
 	protected long countSize(AbstractObjectWapper<?> srcElement, AnalyseListener listener) throws FileException {
 		long size = countSize(srcElement);
 		if (listener != null) {
-			listener.doRecord(srcElement);
+			listener.doRecordDiff(srcElement);
 
 		}
 		return size;
@@ -41,6 +41,11 @@ public abstract class AbstractWorkerHandler implements WorkerHandler {
 		// do nothing in single thread mode
 	}
 
+	protected void checkAfterSync(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
+		// do nothing  
+		
+	}
+	
 	public abstract FileSyncMode syncMode();
 
 }

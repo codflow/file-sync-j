@@ -9,11 +9,15 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.NameScope;
 import org.apache.commons.vfs2.util.FileObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ink.codflow.sync.exception.FileException;
+import ink.codflow.sync.task.SyncFileWorkerHandler;
 
 public class Vfs2VfsObjectManipulationAdapter implements ObjectManipulationAdapter<FileObject, FileObject> {
-
+	
+	private static final Logger log = LoggerFactory.getLogger(Vfs2VfsObjectManipulationAdapter.class);
 	public static final AdapterTypeEnum TYPE_TAG_0 = AdapterTypeEnum.VFS2VFS;
 
 	
@@ -22,6 +26,7 @@ public class Vfs2VfsObjectManipulationAdapter implements ObjectManipulationAdapt
 
 		FileType srcType;
 		FileType destType;
+		log.trace("File:{} synced",src.getName().getBaseName());
 		try {
 			srcType = src.getType();
 			destType = dest.getType();
@@ -36,7 +41,7 @@ public class Vfs2VfsObjectManipulationAdapter implements ObjectManipulationAdapt
 			} else if (FileType.FOLDER.equals(destType)) {
 				copyFileToDir(src, dest);
 			}
-		} else if (FileType.FOLDER.equals(srcType) && FileType.FOLDER.equals(destType)) {
+		} else if (FileType.FOLDER.equals(srcType) && (FileType.FOLDER.equals(destType) || FileType.IMAGINARY.equals(destType))) {
 			copyDirToDir(src, dest);
 		} else {
 			throw new FileException();
@@ -49,7 +54,7 @@ public class Vfs2VfsObjectManipulationAdapter implements ObjectManipulationAdapt
 		try {
 			FileObjectUtils.writeContent(srcFile, destFile);
 		} catch (IOException e) {
-			throw new FileException();
+			throw new FileException(e);
 		}
 
 	}

@@ -93,7 +93,6 @@ public class ClientEndpointPool {
 			String password = auth.getParam(AuthDataType.PASSWD);
 			SftpVfsClient sftpVfsClient0 = new SftpVfsClient(host);
 			sftpVfsClient0.addPasswordIdentity(null, userName, password);
-
 			return sftpVfsClient0;
 		case PUBKEY:
 			String privateKeyPath = LocalSecurityManager.seekLocalUserPrivateKeyPath();
