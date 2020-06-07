@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.SyncProgress;
+import ink.codflow.sync.core.handler.WorkerHandler;
 import ink.codflow.sync.exception.FileException;
 
 public class LinkWorker {
@@ -18,6 +19,9 @@ public class LinkWorker {
 	AbstractObjectWapper<?> srcObject;
 
 	AbstractObjectWapper<?> destObject;
+	
+	TaskSpecs specs;
+	
 
 	public LinkWorker() {
 
@@ -69,10 +73,12 @@ public class LinkWorker {
 
 	// src object type: dir,file ;dest object type: dir,file
 	protected void doSync(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
-		workerHandler.doSync(srcObject, destObject, new SyncListener());
+	    
+	    
+		workerHandler.doSync(srcObject, destObject, new SyncListener(),specs);
 	}
 
-	class SyncListener {
+	public class SyncListener {
 
 		long expire;
 
@@ -109,7 +115,7 @@ public class LinkWorker {
 
 	}
 
-	class AnalyseListener {
+	public class AnalyseListener {
 
 		public void doRecordDiff(AbstractObjectWapper<?> srcObject) throws FileException {
 
@@ -135,5 +141,15 @@ public class LinkWorker {
 	public void setWorkerHandler(WorkerHandler workerHandler) {
 		this.workerHandler = workerHandler;
 	}
+
+    public TaskSpecs getSpecs() {
+        return specs;
+    }
+
+    public void setSpecs(TaskSpecs specs) {
+        this.specs = specs;
+    }
+	
+	
 
 }

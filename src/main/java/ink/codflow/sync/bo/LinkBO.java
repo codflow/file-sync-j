@@ -12,7 +12,9 @@ public class LinkBO {
     
     ClientEndpointBO srcEndpoint;
     ClientEndpointBO distEndpoint;
-
+    
+    long expire;
+    
     FileSyncMode mode;
 
     int maxThread;
