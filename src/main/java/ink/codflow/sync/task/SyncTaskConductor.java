@@ -21,7 +21,7 @@ import ink.codflow.sync.util.IdGen;
 public class SyncTaskConductor {
     int maxThreadSize = 20;
 
-    ExecutorService pool = new ThreadPoolExecutor(10, maxThreadSize, 2000, TimeUnit.MILLISECONDS,
+    ThreadPoolExecutor pool = new ThreadPoolExecutor(10, maxThreadSize, 2000, TimeUnit.MILLISECONDS,
             new LinkedBlockingDeque<>());
     WeakHashMap<String, SyncTask> cacheMap = new WeakHashMap<String, SyncTask>();
 
@@ -57,6 +57,7 @@ public class SyncTaskConductor {
         
         String id = task.getId();
         String traceId ="T-"+id;
+        cacheMap.put(traceId, task);
         pool.submit(task);
         return traceId;
     }
@@ -130,5 +131,10 @@ public class SyncTaskConductor {
         }
         return false;
     }
+    
+    public int countTaskInProgress() {
+    	return pool.getActiveCount();
+    }
+    
 
 }

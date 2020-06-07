@@ -47,10 +47,9 @@ public class FileSyncManager {
 	public String launchTask(SyncTask task) {
 		return conductor.launch(task);
 	}
-	
+
 	public boolean testClient(ClientEndpointBO endpoint) {
 
-		//endpoint.setId(-1);
 		ClientEndpoint<?> clientEndpoint = conductor.getEndpoint(endpoint, true);
 		try {
 			AbstractObjectWapper<?> object = clientEndpoint.resolve("/");
@@ -62,26 +61,28 @@ public class FileSyncManager {
 			return false;
 		}
 	}
-	
-	
 
-    public void deleteClient(ClientEndpointBO clientEndpointBO) {
-        clientEndpointBO.getRootPath();
-        ClientEndpoint<?> endpoint = conductor.getEndpoint(clientEndpointBO,true);
-        try {
-            endpoint.resolve("").remove();
-        } catch (FileException e) {
-            
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-    }
+	public boolean deleteClient(ClientEndpointBO clientEndpointBO) {
+		clientEndpointBO.getRootPath();
+		ClientEndpoint<?> endpoint = conductor.getEndpoint(clientEndpointBO, true);
+		try {
+			endpoint.resolve("").remove();
+			return true;
+		} catch (FileException e) {
 
-    public boolean checkAndTryCancle(String traceId) {
-        return conductor.checkAndTryCancle( traceId);
-    }
+			return false;
+
+		}
+
+	}
+
+	public boolean checkAndTryCancle(String traceId) {
+		return conductor.checkAndTryCancle(traceId);
+	}
 	
 	
-	
+	public int getCurrentActiveTaskNumber() {
+		return conductor.countTaskInProgress();
+	}
+
 }

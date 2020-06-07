@@ -127,8 +127,14 @@ public class MainInterface {
 			public void actionPerformed(ActionEvent e) {
 				TaskBO taskBO = createTaskBO();
 				if (taskBO != null) {
-					SyncTask task0 = fileSyncManager.createSyncTask(taskBO);
-					fileSyncManager.launchTask(task0);
+					
+					if (fileSyncManager.getCurrentActiveTaskNumber()<1) {
+						SyncTask task0 = fileSyncManager.createSyncTask(taskBO);
+						fileSyncManager.launchTask(task0);
+					}
+					ErrorDialog.showQuickErrorDialog("A task is in progress now!");
+
+
 				}
 			}
 		});
