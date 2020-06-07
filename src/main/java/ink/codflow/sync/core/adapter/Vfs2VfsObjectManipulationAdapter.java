@@ -12,8 +12,8 @@ import org.apache.commons.vfs2.util.FileObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ink.codflow.sync.core.handler.SyncFileWorkerHandler;
 import ink.codflow.sync.exception.FileException;
-import ink.codflow.sync.task.SyncFileWorkerHandler;
 
 public class Vfs2VfsObjectManipulationAdapter implements ObjectManipulationAdapter<FileObject, FileObject> {
 	

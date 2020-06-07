@@ -13,218 +13,233 @@ import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.ClientEndpoint;
 import ink.codflow.sync.core.SyncProgress;
+import ink.codflow.sync.core.handler.IncreaseFileWorkerHandler;
+import ink.codflow.sync.core.handler.SyncFileWorkerHandler;
+import ink.codflow.sync.core.handler.WorkerHandler;
 
 public class SyncTask implements Runnable {
 
-	private static final Logger log = LoggerFactory.getLogger(SyncTask.class);
+    private static final Logger log = LoggerFactory.getLogger(SyncTask.class);
 
-	private static final Map<FileSyncMode, WorkerHandler> handlerMap = new HashMap<FileSyncMode, WorkerHandler>();
-	static {
-		//register sync mode handler
-		handlerMap.put(FileSyncMode.FILE_INC, new IncreaseFileWorkerHandler());
-		handlerMap.put(FileSyncMode.SYNC, new SyncFileWorkerHandler());
-	}
+    private static final Map<FileSyncMode, WorkerHandler> handlerMap = new HashMap<FileSyncMode, WorkerHandler>();
+    static {
+        // register sync mode handler
+        handlerMap.put(FileSyncMode.FILE_INC, new IncreaseFileWorkerHandler());
+        handlerMap.put(FileSyncMode.SYNC, new SyncFileWorkerHandler());
+    }
 
-	ClientEndpoint<?> srcEndpoint;
-	ClientEndpoint<?> distEndpoint;
-	List<LinkWorker> workerList = new ArrayList<LinkWorker>();
+    ClientEndpoint<?> srcEndpoint;
+    ClientEndpoint<?> distEndpoint;
+    
+    List<LinkWorker> workerList = new ArrayList<LinkWorker>();
 
-	List<SyncTask> subTaskList = new ArrayList<SyncTask>();
+    List<SyncTask> subTaskList = new ArrayList<SyncTask>();
 
-	SyncProgress syncProgressView = new SyncProgress();
+    SyncProgress syncProgressView = new SyncProgress();
 
-	FileSyncMode mode;
+    FileSyncMode mode;
 
-	List<ObjectBO> selectedObjects;
+    List<ObjectBO> selectedObjects;
 
-	String id;
+    String id;
 
-	public ClientEndpoint<?> getSrcEndpoint() {
-		return srcEndpoint;
-	}
+    TaskSpecs specs;
 
-	public void setSrcEndpoint(ClientEndpoint<?> srcEndpoint) {
-		this.srcEndpoint = srcEndpoint;
-	}
+    public SyncTask(TaskSpecs specs) {
+        this.specs = specs;
+    }
 
-	public ClientEndpoint<?> getDistEndpoint() {
-		return distEndpoint;
-	}
+    public SyncTask() {
 
-	public void setDistEndpoint(ClientEndpoint<?> distEndpoint) {
-		this.distEndpoint = distEndpoint;
-	}
+    }
 
-	public List<LinkWorker> getWorkerList() {
-		return workerList;
-	}
+    public ClientEndpoint<?> getSrcEndpoint() {
+        return srcEndpoint;
+    }
 
-	public void setWorkerList(List<LinkWorker> workerList) {
-		this.workerList = workerList;
-	}
+    public void setSrcEndpoint(ClientEndpoint<?> srcEndpoint) {
+        this.srcEndpoint = srcEndpoint;
+    }
 
-	@Override
-	public void run() {
-		try {
+    public ClientEndpoint<?> getDistEndpoint() {
+        return distEndpoint;
+    }
 
-			if (!getSubTaskList().isEmpty()) {
-				List<SyncTask> tasks = getSubTaskList();
-				for (SyncTask syncTask : tasks) {
-					doRunATask(syncTask);
-				}
-			} else {
-				doRunATask(this);
-			}
-		} catch (Exception e) {
-			log.error("task error", e);
-		}
-	}
+    public void setDistEndpoint(ClientEndpoint<?> distEndpoint) {
+        this.distEndpoint = distEndpoint;
+    }
 
-	void doRunATask(SyncTask task) {
+    public List<LinkWorker> getWorkerList() {
+        return workerList;
+    }
 
-		try {
+    public void setWorkerList(List<LinkWorker> workerList) {
+        this.workerList = workerList;
+    }
 
-			List<ObjectBO> objectUriBOs = task.selectedObjects;
-			if (objectUriBOs != null && !objectUriBOs.isEmpty()) {
-				ArrayList<SimpleObject> simpleObjects = new ArrayList<SimpleObject>();
+    @Override
+    public void run() {
+        try {
 
-				AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
-				AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
-				SelectedLinkWorker linkWorker = new SelectedLinkWorker(srcObject, destObject, simpleObjects);
+            if (!getSubTaskList().isEmpty()) {
+                List<SyncTask> tasks = getSubTaskList();
+                for (SyncTask syncTask : tasks) {
+                    doRunATask(syncTask);
+                }
+            } else {
+                doRunATask(this);
+            }
+        } catch (Exception e) {
+            log.error("task error", e);
+        }
+    }
 
-				for (ObjectBO objectBO : objectUriBOs) {
+    void doRunATask(SyncTask task) {
 
-					String uri = objectBO.getUri();
-					boolean file = objectBO.isFile();
+        try {
 
-					SimpleObject simpleObject = new SimpleObject();
-					simpleObject.setDir(!file);
-					simpleObject.setPath(uri);
-					simpleObjects.add(simpleObject);
-				}
-				FileSyncMode mode0 = task.getMode();
-				WorkerHandler handler = getHandler(mode0);
-				linkWorker.setWorkerHandler(handler);
-				task.workerList.add(linkWorker);
+            List<ObjectBO> objectUriBOs = task.selectedObjects;
+            if (objectUriBOs != null && !objectUriBOs.isEmpty()) {
+                ArrayList<SimpleObject> simpleObjects = new ArrayList<SimpleObject>();
 
-			} else {
+                AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
+                AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
+                SelectedLinkWorker linkWorker = new SelectedLinkWorker(srcObject, destObject, simpleObjects);
+                linkWorker.setSpecs(specs);
+                for (ObjectBO objectBO : objectUriBOs) {
 
-				AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
-				AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
+                    String uri = objectBO.getUri();
+                    boolean file = objectBO.isFile();
 
-				LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
-				FileSyncMode mode0 = task.getMode();
-				WorkerHandler handler = getHandler(mode0);
-				linkWorker.setWorkerHandler(handler);
-				task.workerList.add(linkWorker);
+                    SimpleObject simpleObject = new SimpleObject();
+                    simpleObject.setDir(!file);
+                    simpleObject.setPath(uri);
+                    simpleObjects.add(simpleObject);
+                }
+                FileSyncMode mode0 = task.getMode();
+                WorkerHandler handler = getHandler(mode0);
+                linkWorker.setWorkerHandler(handler);
+                task.workerList.add(linkWorker);
 
-			}
+            } else {
 
-			for (LinkWorker linkWorker : task.workerList) {
-				linkWorker.analyse();
-			}
+                AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
+                AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
+                
+                LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
+                linkWorker.setSpecs(specs);
+                FileSyncMode mode0 = task.getMode();
+                WorkerHandler handler = getHandler(mode0);
+                linkWorker.setWorkerHandler(handler);
+                task.workerList.add(linkWorker);
 
-			for (LinkWorker linkWorker : task.workerList) {
-				linkWorker.sync();
-			}
-		} catch (Exception e) {
-			log.error("task error", e);
-		}
+            }
 
-	}
+            for (LinkWorker linkWorker : task.workerList) {
+                linkWorker.analyse();
+            }
 
-	WorkerHandler getHandler(FileSyncMode mode) {
-		return handlerMap.get(mode);
-	}
+            for (LinkWorker linkWorker : task.workerList) {
+                linkWorker.sync();
+            }
+        } catch (Exception e) {
+            log.error("task error", e);
+        }
 
-	public SyncProgress getSyncProgressView() {
+    }
 
-		if (!this.subTaskList.isEmpty()) {
-			return getSubTaskProgressView();
-		} else if (!this.workerList.isEmpty()) {
-			return getWorkerProgressView();
-		} else {
-			return this.syncProgressView;
-		}
+    WorkerHandler getHandler(FileSyncMode mode) {
+        return handlerMap.get(mode);
+    }
 
-	}
+    public SyncProgress getSyncProgressView() {
 
-	SyncProgress getSubTaskProgressView() {
-		List<SyncTask> subTasks = getSubTaskList();
-		long syncedSize = 0;
-		long analyseSize = 0;
-		long syncedFileCount = 0;
-		long analyseFileCount = 0;
-		long totalDestSize = 0;
-		for (SyncTask syncTask : subTasks) {
-			SyncProgress syncProgress = syncTask.getSyncProgressView();
-			syncedSize += syncProgress.getSyncedSize();
-			analyseSize += syncProgress.getAnalyseSize();
-			syncedFileCount += syncProgress.getSyncedFileCount();
-			analyseFileCount += syncProgress.getAnalyseFileCount();
-			totalDestSize += syncProgress.getTotalDestSize();
-		}
-		SyncProgress syncProgressView0 = new SyncProgress(syncedSize, analyseSize, syncedFileCount, analyseFileCount,
-				totalDestSize);
-		this.syncProgressView = syncProgressView0;
-		return syncProgressView0;
+        if (!this.subTaskList.isEmpty()) {
+            return getSubTaskProgressView();
+        } else if (!this.workerList.isEmpty()) {
+            return getWorkerProgressView();
+        } else {
+            return this.syncProgressView;
+        }
 
-	}
+    }
 
-	SyncProgress getWorkerProgressView() {
+    SyncProgress getSubTaskProgressView() {
+        List<SyncTask> subTasks = getSubTaskList();
+        long syncedSize = 0;
+        long analyseSize = 0;
+        long syncedFileCount = 0;
+        long analyseFileCount = 0;
+        long totalDestSize = 0;
+        for (SyncTask syncTask : subTasks) {
+            SyncProgress syncProgress = syncTask.getSyncProgressView();
+            syncedSize += syncProgress.getSyncedSize();
+            analyseSize += syncProgress.getAnalyseSize();
+            syncedFileCount += syncProgress.getSyncedFileCount();
+            analyseFileCount += syncProgress.getAnalyseFileCount();
+            totalDestSize += syncProgress.getTotalDestSize();
+        }
+        SyncProgress syncProgressView0 = new SyncProgress(syncedSize, analyseSize, syncedFileCount, analyseFileCount,
+                totalDestSize);
+        this.syncProgressView = syncProgressView0;
+        return syncProgressView0;
 
-		List<LinkWorker> workers = getWorkerList();
-		long syncedSize = 0;
-		long analyseSize = 0;
-		long syncedFileCount = 0;
-		long analyseFileCount = 0;
-		long totalDestSize = 0;
+    }
 
-		for (LinkWorker linkWorker : workers) {
-			SyncProgress syncProgress = linkWorker.getProgress();
-			syncedSize += syncProgress.getSyncedSize();
-			analyseSize += syncProgress.getAnalyseSize();
-			syncedFileCount += syncProgress.getSyncedFileCount();
-			analyseFileCount += syncProgress.getAnalyseFileCount();
-			totalDestSize += syncProgress.getTotalDestSize();
+    SyncProgress getWorkerProgressView() {
 
-		}
-		SyncProgress syncProgressView0 = new SyncProgress(syncedSize, analyseSize, syncedFileCount, analyseFileCount,
-				totalDestSize);
-		this.syncProgressView = syncProgressView0;
-		return syncProgressView0;
-	}
+        List<LinkWorker> workers = getWorkerList();
+        long syncedSize = 0;
+        long analyseSize = 0;
+        long syncedFileCount = 0;
+        long analyseFileCount = 0;
+        long totalDestSize = 0;
 
-	public List<SyncTask> getSubTaskList() {
-		return subTaskList;
-	}
+        for (LinkWorker linkWorker : workers) {
+            SyncProgress syncProgress = linkWorker.getProgress();
+            syncedSize += syncProgress.getSyncedSize();
+            analyseSize += syncProgress.getAnalyseSize();
+            syncedFileCount += syncProgress.getSyncedFileCount();
+            analyseFileCount += syncProgress.getAnalyseFileCount();
+            totalDestSize += syncProgress.getTotalDestSize();
 
-	public void addSubTask(SyncTask subTask) {
-		this.subTaskList.add(subTask);
-	}
+        }
+        SyncProgress syncProgressView0 = new SyncProgress(syncedSize, analyseSize, syncedFileCount, analyseFileCount,
+                totalDestSize);
+        this.syncProgressView = syncProgressView0;
+        return syncProgressView0;
+    }
 
-	public FileSyncMode getMode() {
-		return mode;
-	}
+    public List<SyncTask> getSubTaskList() {
+        return subTaskList;
+    }
 
-	public void setMode(FileSyncMode mode) {
-		this.mode = mode;
-	}
+    public void addSubTask(SyncTask subTask) {
+        this.subTaskList.add(subTask);
+    }
 
-	public List<ObjectBO> getSelectedObjects() {
-		return selectedObjects;
-	}
+    public FileSyncMode getMode() {
+        return mode;
+    }
 
-	public void setSelectedObjects(List<ObjectBO> selectedObjects) {
-		this.selectedObjects = selectedObjects;
-	}
+    public void setMode(FileSyncMode mode) {
+        this.mode = mode;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public List<ObjectBO> getSelectedObjects() {
+        return selectedObjects;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setSelectedObjects(List<ObjectBO> selectedObjects) {
+        this.selectedObjects = selectedObjects;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
 }
