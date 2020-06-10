@@ -11,7 +11,7 @@ public class LinkBO {
     int id;
     
     ClientEndpointBO srcEndpoint;
-    ClientEndpointBO distEndpoint;
+    ClientEndpointBO destEndpoint;
     
     long expire;
     

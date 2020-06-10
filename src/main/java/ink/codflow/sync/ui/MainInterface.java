@@ -128,11 +128,13 @@ public class MainInterface {
 				TaskBO taskBO = createTaskBO();
 				if (taskBO != null) {
 					
-					if (fileSyncManager.getCurrentActiveTaskNumber()<1) {
+					if (fileSyncManager.getCurrentActiveTaskNumber()>0) {
 						SyncTask task0 = fileSyncManager.createSyncTask(taskBO);
 						fileSyncManager.launchTask(task0);
+					}else {
+						ErrorDialog.showQuickErrorDialog("A task is in progress now!");
+
 					}
-					ErrorDialog.showQuickErrorDialog("A task is in progress now!");
 
 
 				}
@@ -257,7 +259,7 @@ public class MainInterface {
 		if (srcClientEndpointBO != null && destClientEndpointBO != null) {
 			LinkBO linkBO = new LinkBO();
 			linkBO.setSrcEndpoint(srcClientEndpointBO);
-			linkBO.setDistEndpoint(destClientEndpointBO);
+			linkBO.setDestEndpoint(destClientEndpointBO);
 			linkBO.setId(0);
 			return linkBO;
 		}

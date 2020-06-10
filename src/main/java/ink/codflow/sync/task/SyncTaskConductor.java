@@ -85,7 +85,7 @@ public class SyncTaskConductor {
 
     public SyncTask createTask(LinkBO linkBO, List<ObjectBO> objectList, FileSyncMode mode) {
 
-        ClientEndpointBO destEndpointBO = linkBO.getDistEndpoint();
+        ClientEndpointBO destEndpointBO = linkBO.getDestEndpoint();
         ClientEndpointBO srcEndpointBO = linkBO.getSrcEndpoint();
         int srcEndpointId = srcEndpointBO.getId();
         int dstEndpointId = destEndpointBO.getId();
@@ -113,8 +113,11 @@ public class SyncTaskConductor {
         for (WorkerTaskBO workerTaskBO : workerTasklist) {
             List<ObjectBO> objectUriList = workerTaskBO.getObjectList();
             LinkBO linkBO = workerTaskBO.getLinkBO();
-            ClientEndpointBO distEndpointBO = linkBO.getDistEndpoint();
+            ClientEndpointBO distEndpointBO = linkBO.getDestEndpoint();
             ClientEndpointBO srcEndpointBO = linkBO.getSrcEndpoint();
+            if (distEndpointBO.getId() == srcEndpointBO.getId()) {
+				
+			}
             FileSyncMode mode = linkBO.getMode();
             registerEndpoint(srcEndpointBO);
             registerEndpoint(distEndpointBO);

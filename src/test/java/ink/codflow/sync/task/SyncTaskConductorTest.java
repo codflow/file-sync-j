@@ -44,12 +44,11 @@ public class SyncTaskConductorTest {
 		
 		ClientEndpointBO dClientEndpointBO =  ClientEndpointBO.builder().authenticationBO(dAuthenticationBO).type(ClientTypeEnum.LOCAL).rootPath(drootPath).id(33000).build();
 
-		linkBO.setDistEndpoint(dClientEndpointBO);
+		linkBO.setDestEndpoint(dClientEndpointBO);
 		
 		SyncTaskConductor conductor = new SyncTaskConductor();
 		
 		List<ObjectBO> selectedObjects = new ArrayList<ObjectBO>();
-		
 		
 		ObjectBO objectBO = new ObjectBO();
 		objectBO.setLinkId(66106);

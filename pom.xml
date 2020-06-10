@@ -19,7 +19,6 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<!-- Import dependency management from Spring Boot -->
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
 				<version>2.1.1.RELEASE</version>
@@ -45,13 +44,11 @@
 			<version>2.6.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
@@ -97,7 +94,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>cn.infocore.Application</mainClass>
+							<mainClass>ink.codflow.sync.Application</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
