@@ -10,7 +10,7 @@ File-Sync-J 是以文件为粒度的同步工具，由Java编写。它作为中�
 在装有Java环境下执行程序
 
 ```
-    java -jar file-sync-j-0.0.1-SNAPSHOT.jar
+    java -jar file-sync-j-0.0.1-alpha.jar
 ```
 
 ### 添加节点

@@ -10,7 +10,7 @@ File-Sync-J is a file-level synchronization program in Java language.As a interm
 Start the program in java environment.
 
 ```
-    java -jar file-sync-j-0.0.1-SNAPSHOT.jar
+    java -jar file-sync-j-0.0.1-alpha.jar
 ```
 
 ### Add Endpoint
