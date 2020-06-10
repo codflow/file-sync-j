@@ -24,12 +24,14 @@ Start the program in java environment.
     3.Click "Test" to test endpoint. There would be a green circle next to type
 
   ![step4](https://raw.githubusercontent.com/codflow/file-sync-j/master/doc/images/endpoint_sftp_0.png)
+  
     4.Click "Add".
 
 ### Sync Endpoint
 
     
   ![step1](https://raw.githubusercontent.com/codflow/file-sync-j/master/doc/images/main_ui_1.png)
+
     1.Choose a Source Endpoint and a Destination Endpoint(They can not be the same one).
 
     2.Click Sync.

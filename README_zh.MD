@@ -23,11 +23,14 @@ File-Sync-J 是以文件为粒度的同步工具，由Java编写。它作为中�
     3.点击Test按钮测试节点信息，测试成功在Type旁会显示绿圈以示通过。
 
   ![step4](https://raw.githubusercontent.com/codflow/file-sync-j/master/doc/images/endpoint_sftp_0.png)
+
     4.点击 "Add" 添加节点.
 
 ### 同步节点
 
   ![step1](https://raw.githubusercontent.com/codflow/file-sync-j/master/doc/images/main_ui_1.png)
+
+  
     1.选择一个源节点和一个目标节点（不能是同一个节点）。
 
     2.点击同步.
