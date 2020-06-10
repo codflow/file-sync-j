@@ -2,7 +2,6 @@ package ink.codflow.sync.task;
 
 import java.util.List;
 import java.util.WeakHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -19,6 +18,8 @@ import ink.codflow.sync.core.ClientEndpointPool;
 import ink.codflow.sync.util.IdGen;
 
 public class SyncTaskConductor {
+    
+    
     int maxThreadSize = 20;
 
     ThreadPoolExecutor pool = new ThreadPoolExecutor(10, maxThreadSize, 2000, TimeUnit.MILLISECONDS,
@@ -107,7 +108,7 @@ public class SyncTaskConductor {
     public SyncTask createSyncTask(TaskBO taskBO) {
 
         SyncTask task = new SyncTask();
-
+        task.setId(IdGen.genUUID());
         List<WorkerTaskBO> workerTasklist = taskBO.getWorkerTasklist();
         for (WorkerTaskBO workerTaskBO : workerTasklist) {
             List<ObjectBO> objectUriList = workerTaskBO.getObjectList();
@@ -117,9 +118,11 @@ public class SyncTaskConductor {
             FileSyncMode mode = linkBO.getMode();
             registerEndpoint(srcEndpointBO);
             registerEndpoint(distEndpointBO);
-            task.addSubTask(createTask(linkBO, objectUriList, mode));
+            TaskSpecs specs = workerTaskBO.getSpecs();
+            SyncTask subSyncTask = createTask(linkBO, objectUriList, mode);
+            subSyncTask.setSpecs(specs);
+            task.addSubTask(subSyncTask);
         }
-
         return task;
     }
 
@@ -135,6 +138,9 @@ public class SyncTaskConductor {
     public int countTaskInProgress() {
     	return pool.getActiveCount();
     }
+    
+    
+    
     
 
 }

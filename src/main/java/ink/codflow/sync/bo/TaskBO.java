@@ -11,6 +11,8 @@ public class TaskBO {
     
     List<WorkerTaskBO> workerTasklist = new ArrayList<WorkerTaskBO>();
     
+    
+    
     public  void addWorkerTask(WorkerTaskBO workerTaskBO) {
         workerTasklist.add(workerTaskBO);
     }

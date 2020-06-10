@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.provider.local.WindowsFileName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,15 +39,24 @@ public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
 
 	public VfsObjectWapper(FileObject fileObject, ClientEndpoint<FileObject> endpoint) {
 		super(fileObject, endpoint);
-		String uri = fileObject.getName().getPath();
-		this.setUri(uri);
+		FileName name = fileObject.getName();
+		
+		if (name instanceof WindowsFileName) {
+		    WindowsFileName windowsFileName = (WindowsFileName)name;
+		    String uri = windowsFileName.getURI();
+		    uri=uri.substring(8);
+		    this.setUri(uri);
+        }else {
+            String uri = fileObject.getName().getPath();
+            this.setUri(uri);
+
+        }
+		
 	}
 
 	@Override
 	public void copyFrom(AbstractObjectWapper<?> objectWapper) throws FileException {
-
 		doCopyFromWithTimeStamp(objectWapper);
-		
 	}
 
 
@@ -190,7 +201,7 @@ public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
 		try {
 			return this.doGetObject().exists();
 		} catch (FileSystemException | FileException e) {
-			throw new FileException();
+			throw new FileException(e);
 		}
 	}
 

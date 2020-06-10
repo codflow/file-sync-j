@@ -6,7 +6,7 @@ import ink.codflow.sync.consts.SyncStatusEnum;
 
 public class SyncProgress {
 
-    private volatile SyncStatusEnum status;
+    private volatile SyncStatusEnum status = SyncStatusEnum.CREATE;
 
     AtomicLong totalDestSize;
 
@@ -31,7 +31,7 @@ public class SyncProgress {
 
     public SyncProgress(long syncedSize, long analyseSize, long syncedFileCount, long analyseFileCount,long totalDestSize) {
 
-        this.analyseFileCount = new AtomicLong(syncedSize);
+        this.syncedSize = new AtomicLong(syncedSize);
         this.analyseSize = new AtomicLong(analyseSize);
         this.syncedFileCount = new AtomicLong(syncedFileCount);
         this.analyseFileCount = new AtomicLong(analyseFileCount);

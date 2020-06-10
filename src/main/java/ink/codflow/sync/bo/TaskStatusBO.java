@@ -12,20 +12,20 @@ public class TaskStatusBO {
     
     String traceId;
     
-    Long totalSize;
+    long totalSize;
     
-    Long analyzedSize;
+    long analyzedSize;
     
     
     TaskType type;
     
     SyncStatusEnum status;
     
-    Integer progress; 
+    int progress; 
     
-    Integer createTime;
+    int createTime;
     
-    Integer endTime;
+    int endTime;
 
     public String getId() {
         return id;

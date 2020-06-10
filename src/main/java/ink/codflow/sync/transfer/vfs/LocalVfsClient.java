@@ -43,7 +43,7 @@ public class LocalVfsClient implements Client<FileObject> {
 
 			return dst;
 		} catch (FileSystemException e) {
-			throw new FileException();
+			throw new FileException(e);
 		}
 	}
 

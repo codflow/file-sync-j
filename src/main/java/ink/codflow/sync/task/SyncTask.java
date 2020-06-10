@@ -10,12 +10,15 @@ import org.slf4j.LoggerFactory;
 
 import ink.codflow.sync.bo.ObjectBO;
 import ink.codflow.sync.consts.FileSyncMode;
+import ink.codflow.sync.consts.SyncStatusEnum;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.ClientEndpoint;
 import ink.codflow.sync.core.SyncProgress;
 import ink.codflow.sync.core.handler.IncreaseFileWorkerHandler;
+import ink.codflow.sync.core.handler.MetaOptFileWorkerHandler;
 import ink.codflow.sync.core.handler.SyncFileWorkerHandler;
 import ink.codflow.sync.core.handler.WorkerHandler;
+import ink.codflow.sync.exception.BackupInterruptException;
 
 public class SyncTask implements Runnable {
 
@@ -26,11 +29,14 @@ public class SyncTask implements Runnable {
         // register sync mode handler
         handlerMap.put(FileSyncMode.FILE_INC, new IncreaseFileWorkerHandler());
         handlerMap.put(FileSyncMode.SYNC, new SyncFileWorkerHandler());
+        handlerMap.put(FileSyncMode.META_OPTIMIZED, new MetaOptFileWorkerHandler());
     }
+
+    TaskStatusListener taskStatusListener;
 
     ClientEndpoint<?> srcEndpoint;
     ClientEndpoint<?> distEndpoint;
-    
+
     List<LinkWorker> workerList = new ArrayList<LinkWorker>();
 
     List<SyncTask> subTaskList = new ArrayList<SyncTask>();
@@ -71,6 +77,15 @@ public class SyncTask implements Runnable {
 
     public List<LinkWorker> getWorkerList() {
         return workerList;
+    }
+
+    
+    public TaskStatusListener getTaskStatusListener() {
+        return taskStatusListener;
+    }
+
+    public void setTaskStatusListener(TaskStatusListener taskStatusListener) {
+        this.taskStatusListener = taskStatusListener;
     }
 
     public void setWorkerList(List<LinkWorker> workerList) {
@@ -125,7 +140,7 @@ public class SyncTask implements Runnable {
 
                 AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
                 AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
-                
+
                 LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
                 linkWorker.setSpecs(specs);
                 FileSyncMode mode0 = task.getMode();
@@ -139,9 +154,21 @@ public class SyncTask implements Runnable {
                 linkWorker.analyse();
             }
 
+            if (taskStatusListener != null) {
+                if (!taskStatusListener.statusChange(getSyncProgressView(), getSyncProgressView().getStatus())) {
+                    throw new BackupInterruptException();
+                }
+            }
+
             for (LinkWorker linkWorker : task.workerList) {
                 linkWorker.sync();
             }
+
+            if (taskStatusListener != null) {
+                SyncStatusEnum status = getSyncProgressView().getStatus();
+                taskStatusListener.statusChange(getSyncProgressView(), status);
+            }
+
         } catch (Exception e) {
             log.error("task error", e);
         }
@@ -242,4 +269,13 @@ public class SyncTask implements Runnable {
         this.id = id;
     }
 
+    public TaskSpecs getSpecs() {
+        return specs;
+    }
+
+    public void setSpecs(TaskSpecs specs) {
+        this.specs = specs;
+    }
+
+    
 }

@@ -132,4 +132,10 @@ public class OssClient implements Client<OssObject> {
 		this.client.shutdown();
 	}
 
+    public OSS getClient() {
+        return client;
+    }
+	
+	
+
 }

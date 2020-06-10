@@ -13,5 +13,6 @@ public class ObjectBO {
     
     String name;
 
+    Long size;
     
 }
