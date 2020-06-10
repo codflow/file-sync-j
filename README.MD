@@ -19,7 +19,7 @@ Start the program in java environment.
     
     2.Select endpoint type (local and sftp are supported.more types are coming soon).
 
-    3.Click "Test" to test endpoint. There would be a green cirle next to type
+    3.Click "Test" to test endpoint. There would be a green circle next to type
 
     4.Click "Add".
 
@@ -35,4 +35,4 @@ Start the program in java environment.
     
     SYNC: keep keep destination endpoint as same as source enpoint
 
-    INC: fetch new file from source to destination but not delete files which removed at source
+    INC: fetch new file from source to destination but not delete files which removed
