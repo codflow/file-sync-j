@@ -29,7 +29,7 @@ public class FileSyncManager {
 
 	public SyncTask createSyncTask(LinkBO link, List<ObjectBO> selectedObjects, FileSyncMode mode) {
 
-		ClientEndpointBO distEndpointBO = link.getDistEndpoint();
+		ClientEndpointBO distEndpointBO = link.getDestEndpoint();
 		ClientEndpointBO srcEndpointBO = link.getSrcEndpoint();
 
 		FileSyncMode mode0 = mode != null ? mode : link.getMode();
