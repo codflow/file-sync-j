@@ -128,7 +128,7 @@ public class MainInterface {
 				TaskBO taskBO = createTaskBO();
 				if (taskBO != null) {
 					
-					if (fileSyncManager.getCurrentActiveTaskNumber()>0) {
+					if (fileSyncManager.getCurrentActiveTaskNumber()<1) {
 						SyncTask task0 = fileSyncManager.createSyncTask(taskBO);
 						fileSyncManager.launchTask(task0);
 					}else {

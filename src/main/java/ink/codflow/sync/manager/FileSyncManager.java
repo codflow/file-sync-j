@@ -59,7 +59,7 @@ public class FileSyncManager {
         ClientEndpoint<?> clientEndpoint = conductor.getEndpoint(endpoint, true);
 
         try {
-            AbstractObjectWapper<?> object = clientEndpoint.resolve("/");
+            AbstractObjectWapper<?> object = clientEndpoint.resolve("");
 
             object.listChildren();
             return true;
