@@ -73,14 +73,14 @@ public class FileSyncManager {
         clientEndpointBO.getRootPath();
         ClientEndpoint<?> endpoint = conductor.getEndpoint(clientEndpointBO, true);
         try {
-            endpoint.resolve("").remove();
+            AbstractObjectWapper<?> wapper = endpoint.resolve("");
+            if (wapper.isExist()) {
+                wapper.remove();
+            }
             return true;
         } catch (FileException e) {
-
             return false;
-
         }
-
     }
 
     public boolean checkAndTryCancle(String traceId) {
@@ -131,9 +131,4 @@ public class FileSyncManager {
         throw new FileException("Wrong oss client arguments!");
     }
 
-
-
- 
-
- 
 }

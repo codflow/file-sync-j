@@ -40,7 +40,7 @@ public class ClientEndpoint<T> {
 
     public AbstractObjectWapper<T> resolve(String path) throws FileException {
 
-        if (path.charAt(0) != '/' && path.charAt(1)!=':' ) {
+        if (path.isEmpty() || (path.charAt(0) != '/' && path.charAt(1)!=':') ) {
             if (this.getRoot() != null) {
                 String path0 = new StringBuilder(this.getRoot()).append(path).toString();
                 return doResolve(path0);
