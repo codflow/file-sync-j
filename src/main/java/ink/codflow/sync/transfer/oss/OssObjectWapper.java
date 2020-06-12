@@ -57,7 +57,6 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 			OssObjectWapper wapper = new OssObjectWapper(ossObject, getEndpoint());
 			abstractObjectWappers.add(wapper);
 		}
-
 		return abstractObjectWappers;
 	}
 
