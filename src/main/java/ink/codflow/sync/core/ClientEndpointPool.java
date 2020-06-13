@@ -8,6 +8,7 @@ import ink.codflow.sync.bo.ClientEndpointBO;
 import ink.codflow.sync.consts.AuthDataType;
 import ink.codflow.sync.consts.AuthenticationType;
 import ink.codflow.sync.consts.ClientTypeEnum;
+import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.security.LocalSecurityManager;
 import ink.codflow.sync.transfer.Client;
 import ink.codflow.sync.transfer.oss.OssAuthentication;
@@ -24,7 +25,7 @@ public class ClientEndpointPool {
 
 	}
 
-	public ClientEndpoint<?> create(ClientEndpointBO endpointBO) {
+	public ClientEndpoint<?> create(ClientEndpointBO endpointBO) throws FileException {
 
 		ClientEndpoint<?> clientEndpoint = new ClientEndpoint<>();
 		int id = endpointBO.getId();
@@ -39,7 +40,7 @@ public class ClientEndpointPool {
 
 	}
 
-	Client<?> doCreateClient(ClientEndpointBO endpointBO) {
+	Client<?> doCreateClient(ClientEndpointBO endpointBO) throws FileException {
 		ClientTypeEnum type = endpointBO.getType();
 
 		switch (type) {
@@ -81,7 +82,7 @@ public class ClientEndpointPool {
 		return cLocalVfsClient;
 	}
 
-	SftpVfsClient createSftpClient(AuthenticationBO auth) {
+	SftpVfsClient createSftpClient(AuthenticationBO auth) throws FileException {
 
 		AuthenticationType authType = auth.getAuthType();
 		String host = auth.getParam(AuthDataType.HOST);

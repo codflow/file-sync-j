@@ -22,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import ink.codflow.sync.bo.ClientEndpointBO;
+import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.manager.FileSyncManager;
 import ink.codflow.sync.ui.MainInterface.PanelActionListener;
 import ink.codflow.sync.ui.endpoint.EndpointPanelContainer;
@@ -257,10 +258,11 @@ public class EndpointEditor {
 
 		ClientEndpointBO clientEndpointBO = this.currentContainer.getEndpointBO();
 
-		if (fileSyncManager.testClient(clientEndpointBO)) {
-			this.verfiedEndpointBO = clientEndpointBO;
-			return true;
-		}
+
+			if (fileSyncManager.testClient(clientEndpointBO)) {
+				this.verfiedEndpointBO = clientEndpointBO;
+				return true;
+			}
 		return false;
 	}
 

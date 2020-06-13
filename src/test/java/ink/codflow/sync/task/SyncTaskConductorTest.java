@@ -16,11 +16,12 @@ import ink.codflow.sync.consts.AuthDataType;
 import ink.codflow.sync.consts.AuthenticationType;
 import ink.codflow.sync.consts.ClientTypeEnum;
 import ink.codflow.sync.consts.FileSyncMode;
+import ink.codflow.sync.exception.FileException;
 
 public class SyncTaskConductorTest {
 
 	@Test
-	public void test() {
+	public void test() throws FileException {
 		
 		
 		LinkBO linkBO = new LinkBO();

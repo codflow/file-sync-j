@@ -18,6 +18,7 @@ import org.apache.commons.vfs2.provider.sftp.SftpFileSystemConfigBuilder;
 
 import ink.codflow.sync.consts.ClientTypeEnum;
 import ink.codflow.sync.core.AbstractObjectWapper;
+import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.security.LocalSecurityManager;
 import ink.codflow.sync.transfer.Client;
 
@@ -37,7 +38,7 @@ public class SftpVfsClient implements Client<FileObject> {
 		this.host = host;
 	}
 
-	public void addPublicKeyIdentity(String user, String privateKeyPath) {
+	public void addPublicKeyIdentity(String user, String privateKeyPath) throws FileException {
 		opts = new FileSystemOptions();
 		try {
 			String username = user;
@@ -48,11 +49,11 @@ public class SftpVfsClient implements Client<FileObject> {
 			sftpConfigBuilder.setIdentityProvider(opts, id);
 			sftpConfigBuilder.setUserDirIsRoot(opts, false);
 		} catch (FileSystemException e) {
-			e.printStackTrace();
+			throw new FileException(e);
 		}
 	}
 
-	public void addPasswordIdentity(String domain, String user, String password) {
+	public void addPasswordIdentity(String domain, String user, String password) throws FileException {
 		StaticUserAuthenticator auth = new StaticUserAuthenticator(domain, user, password);
 		opts = new FileSystemOptions();
 		try {
@@ -60,12 +61,12 @@ public class SftpVfsClient implements Client<FileObject> {
 			SftpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(opts, false);
 
 		} catch (FileSystemException e) {
-			e.printStackTrace();
+			throw new FileException(e);
 		}
 	}
 	
 
-	public FileObject[] list(String path) {
+	public FileObject[] list(String path) throws FileException {
 		try {
 			manager = VFS.getManager();
 			StringBuilder sb = new StringBuilder(prefix).append(host).append(path);
@@ -74,20 +75,20 @@ public class SftpVfsClient implements Client<FileObject> {
 			FileObject[] files = fo.getChildren();
 			return files;
 		} catch (FileSystemException e) {
-			e.printStackTrace();
+			throw new FileException(e);
 		}
-		return null;
+
 	}
 
-	public FileObject resolve(String path) {
+	public FileObject resolve(String path) throws FileException {
 		try {
 			FileObject fo = VFS.getManager().resolveFile(getPath(path), opts);
 			return fo;
 		} catch (FileSystemException e) {
-			e.printStackTrace();
+			throw new FileException(e);
 		}
 
-		return null;
+
 	}
 
 	URI getUri(String absolutePath) {

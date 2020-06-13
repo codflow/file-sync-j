@@ -33,7 +33,7 @@ public class FileSyncManager {
 		this.conductor = conductor;
 	}
 
-	public SyncTask createSyncTask(LinkBO link, List<ObjectBO> selectedObjects, FileSyncMode mode) {
+	public SyncTask createSyncTask(LinkBO link, List<ObjectBO> selectedObjects, FileSyncMode mode) throws FileException {
 
 		ClientEndpointBO distEndpointBO = link.getDestEndpoint();
 		ClientEndpointBO srcEndpointBO = link.getSrcEndpoint();
@@ -45,7 +45,7 @@ public class FileSyncManager {
 		return task;
 	}
 
-	public SyncTask createSyncTask(TaskBO taskBO) {
+	public SyncTask createSyncTask(TaskBO taskBO) throws FileException {
 
 		return conductor.createSyncTask(taskBO);
 	}
@@ -54,11 +54,12 @@ public class FileSyncManager {
 		return conductor.launch(task);
 	}
 
-	public boolean testClient(ClientEndpointBO endpoint) {
+	public boolean testClient(ClientEndpointBO endpoint){
 
-		ClientEndpoint<?> clientEndpoint = conductor.getEndpoint(endpoint, true);
 
 		try {
+			ClientEndpoint<?> clientEndpoint = conductor.getEndpoint(endpoint, true);
+
 			String root = clientEndpoint.getRoot();
 			String testPath = "";
 			if (root == null) {
@@ -73,7 +74,7 @@ public class FileSyncManager {
 		}
 	}
 
-	public boolean deleteClient(ClientEndpointBO clientEndpointBO) {
+	public boolean deleteClient(ClientEndpointBO clientEndpointBO) throws FileException {
 		clientEndpointBO.getRootPath();
 		ClientEndpoint<?> endpoint = conductor.getEndpoint(clientEndpointBO, true);
 		try {

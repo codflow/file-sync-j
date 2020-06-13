@@ -25,6 +25,7 @@ import ink.codflow.sync.bo.TaskBO;
 import ink.codflow.sync.bo.WorkerTaskBO;
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.exception.ArgumentsException;
+import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.manager.FileSyncManager;
 import ink.codflow.sync.task.SyncTask;
 
@@ -35,7 +36,7 @@ public class MainInterface {
 	Map<String, ClientEndpointBO> map = new HashMap<String, ClientEndpointBO>();
 
 	Map<String, FileSyncMode> modeMap = new HashMap<String, FileSyncMode>();
-	JFrame jf ;
+	JFrame jf;
 	JPanel mainpanel;
 	JButton addEndPointBtn;
 	JComboBox<String> modeComboBox;
@@ -55,11 +56,9 @@ public class MainInterface {
 	}
 
 	public void loadMainPanel() {
-		
-		
 
 		jf = new JFrame("File-Sync-J");
-		
+
 		jf.setSize(280, 250);
 		jf.setLocationRelativeTo(null);
 		jf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -127,15 +126,21 @@ public class MainInterface {
 			public void actionPerformed(ActionEvent e) {
 				TaskBO taskBO = createTaskBO();
 				if (taskBO != null) {
-					
-					if (fileSyncManager.getCurrentActiveTaskNumber()<1) {
-						SyncTask task0 = fileSyncManager.createSyncTask(taskBO);
-						fileSyncManager.launchTask(task0);
-					}else {
+
+					if (fileSyncManager.getCurrentActiveTaskNumber() < 1) {
+						SyncTask task0;
+						try {
+							task0 = fileSyncManager.createSyncTask(taskBO);
+							fileSyncManager.launchTask(task0);
+
+						} catch (FileException e1) {
+							ErrorDialog.showQuickErrorDialog(e1);
+
+						}
+					} else {
 						ErrorDialog.showQuickErrorDialog("A task is in progress now!");
 
 					}
-
 
 				}
 			}
@@ -149,8 +154,7 @@ public class MainInterface {
 				ErrorDialog.showQuickErrorDialog("Not support yet");
 			}
 		});
-		
-		
+
 		JButton cancleBtn = new JButton("Cancle");
 		cancleBtn.addActionListener(new ActionListener() { // NOSONAR no lambda for lower java version
 
@@ -159,7 +163,7 @@ public class MainInterface {
 				ErrorDialog.showQuickErrorDialog("Not support yet");
 			}
 		});
-		
+
 		JPanel controlPanel = new JPanel();
 		controlPanel.add(syncBtn);
 		controlPanel.add(pauseBtn);
@@ -263,7 +267,7 @@ public class MainInterface {
 			linkBO.setId(0);
 			return linkBO;
 		}
-		
+
 		throw new ArgumentsException("Endpoint are not selected");
 	}
 

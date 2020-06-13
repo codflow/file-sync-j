@@ -15,6 +15,7 @@ import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.consts.SyncStatusEnum;
 import ink.codflow.sync.core.ClientEndpoint;
 import ink.codflow.sync.core.ClientEndpointPool;
+import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.util.IdGen;
 
 public class SyncTaskConductor {
@@ -28,17 +29,17 @@ public class SyncTaskConductor {
 
     ClientEndpointPool clientPool = new ClientEndpointPool();
 
-    public Integer registerEndpoint(ClientEndpointBO endpointBO) {
+    public Integer registerEndpoint(ClientEndpointBO endpointBO) throws FileException {
 
         ClientEndpoint<?> endPoint = clientPool.create(endpointBO);
         return endPoint.getId();
     }
 
-    public ClientEndpoint<?> getEndpoint(ClientEndpointBO endpointBO) {
+    public ClientEndpoint<?> getEndpoint(ClientEndpointBO endpointBO) throws FileException {
         return getEndpoint(endpointBO, false);
     }
 
-    public ClientEndpoint<?> getEndpoint(ClientEndpointBO endpointBO, boolean renew) {
+    public ClientEndpoint<?> getEndpoint(ClientEndpointBO endpointBO, boolean renew) throws FileException {
         int clientId = endpointBO.getId();
 
         ClientEndpoint<?> endPoint = clientPool.getEndpoint(clientId);
@@ -48,7 +49,7 @@ public class SyncTaskConductor {
         return endPoint;
     }
 
-    public SyncTask createSyncTask(LinkBO link, List<ObjectBO> selectedObjects, FileSyncMode mode) {
+    public SyncTask createSyncTask(LinkBO link, List<ObjectBO> selectedObjects, FileSyncMode mode) throws FileException {
 
         FileSyncMode mode0 = mode != null ? mode : link.getMode();
         return createTask(link, selectedObjects, mode0);
@@ -83,7 +84,7 @@ public class SyncTaskConductor {
         return syncTask;
     }
 
-    public SyncTask createTask(LinkBO linkBO, List<ObjectBO> objectList, FileSyncMode mode) {
+    public SyncTask createTask(LinkBO linkBO, List<ObjectBO> objectList, FileSyncMode mode) throws FileException {
 
         ClientEndpointBO destEndpointBO = linkBO.getDestEndpoint();
         ClientEndpointBO srcEndpointBO = linkBO.getSrcEndpoint();
@@ -105,7 +106,7 @@ public class SyncTaskConductor {
 
     }
 
-    public SyncTask createSyncTask(TaskBO taskBO) {
+    public SyncTask createSyncTask(TaskBO taskBO) throws FileException {
 
         SyncTask task = new SyncTask();
         task.setId(IdGen.genUUID());
