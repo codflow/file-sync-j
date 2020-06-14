@@ -155,7 +155,7 @@ public class MainInterface {
 			}
 		});
 
-		JButton cancleBtn = new JButton("Cancle");
+		JButton cancleBtn = new JButton("Cancel");
 		cancleBtn.addActionListener(new ActionListener() { // NOSONAR no lambda for lower java version
 
 			@Override
