@@ -32,4 +32,9 @@ public enum SyncStatusEnum {
         return MAP.get(name);
     }
 
+    public static SyncStatusEnum resolveOrigin(int origin) {
+
+        return SyncStatusEnum.values()[origin];
+    }
+
 }

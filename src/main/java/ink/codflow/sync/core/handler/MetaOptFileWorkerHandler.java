@@ -69,6 +69,8 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
                     long objectSize = countSize(srcObject, listener);
                     totalSize += objectSize;
                 }
+                // record total size
+                listener.doRecordFile(srcObject);
             }
             checkAfterAnalyse(srcObject, destObject);
         } catch (FileException e) {

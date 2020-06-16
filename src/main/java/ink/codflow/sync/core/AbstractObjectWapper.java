@@ -208,6 +208,7 @@ public abstract class AbstractObjectWapper<T> {
 
 	public abstract void copyFrom(AbstractObjectWapper<?> objectWapper) throws FileException;
 
-    public abstract void remove()  throws FileException ;
+	public abstract void remove()  throws FileException ;
+	public abstract void create() throws FileException;
 
 }

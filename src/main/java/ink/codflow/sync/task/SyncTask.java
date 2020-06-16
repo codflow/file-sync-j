@@ -19,6 +19,7 @@ import ink.codflow.sync.core.handler.MetaOptFileWorkerHandler;
 import ink.codflow.sync.core.handler.SyncFileWorkerHandler;
 import ink.codflow.sync.core.handler.WorkerHandler;
 import ink.codflow.sync.exception.BackupInterruptException;
+import ink.codflow.sync.thread.TaskStatus;
 
 public class SyncTask implements Runnable {
 
@@ -79,7 +80,6 @@ public class SyncTask implements Runnable {
         return workerList;
     }
 
-    
     public TaskStatusListener getTaskStatusListener() {
         return taskStatusListener;
     }
@@ -118,6 +118,7 @@ public class SyncTask implements Runnable {
                 ArrayList<SimpleObject> simpleObjects = new ArrayList<SimpleObject>();
 
                 AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
+
                 AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
                 SelectedLinkWorker linkWorker = new SelectedLinkWorker(srcObject, destObject, simpleObjects);
                 linkWorker.setSpecs(specs);
@@ -140,7 +141,7 @@ public class SyncTask implements Runnable {
 
                 AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
                 AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
-
+                
                 LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
                 linkWorker.setSpecs(specs);
                 FileSyncMode mode0 = task.getMode();
@@ -151,6 +152,7 @@ public class SyncTask implements Runnable {
             }
 
             for (LinkWorker linkWorker : task.workerList) {
+                
                 linkWorker.analyse();
             }
 
@@ -198,6 +200,7 @@ public class SyncTask implements Runnable {
         long syncedFileCount = 0;
         long analyseFileCount = 0;
         long totalDestSize = 0;
+        int taskStatusOrgin = 99;
         for (SyncTask syncTask : subTasks) {
             SyncProgress syncProgress = syncTask.getSyncProgressView();
             syncedSize += syncProgress.getSyncedSize();
@@ -205,9 +208,19 @@ public class SyncTask implements Runnable {
             syncedFileCount += syncProgress.getSyncedFileCount();
             analyseFileCount += syncProgress.getAnalyseFileCount();
             totalDestSize += syncProgress.getTotalDestSize();
+            SyncStatusEnum status = syncProgress.getStatus();
+            if (status.ordinal() < taskStatusOrgin) {
+                taskStatusOrgin = status.ordinal();
+            }
         }
+
+        
+        SyncStatusEnum finalStatus = SyncStatusEnum.resolveOrigin(taskStatusOrgin);
+
         SyncProgress syncProgressView0 = new SyncProgress(syncedSize, analyseSize, syncedFileCount, analyseFileCount,
                 totalDestSize);
+
+        syncProgressView0.setStatus(finalStatus);
         this.syncProgressView = syncProgressView0;
         return syncProgressView0;
 
@@ -221,7 +234,7 @@ public class SyncTask implements Runnable {
         long syncedFileCount = 0;
         long analyseFileCount = 0;
         long totalDestSize = 0;
-
+        int taskStatusOrgin = 99;
         for (LinkWorker linkWorker : workers) {
             SyncProgress syncProgress = linkWorker.getProgress();
             syncedSize += syncProgress.getSyncedSize();
@@ -229,10 +242,15 @@ public class SyncTask implements Runnable {
             syncedFileCount += syncProgress.getSyncedFileCount();
             analyseFileCount += syncProgress.getAnalyseFileCount();
             totalDestSize += syncProgress.getTotalDestSize();
-
+            SyncStatusEnum status = syncProgress.getStatus();
+            if (status.ordinal() < taskStatusOrgin) {
+                taskStatusOrgin = status.ordinal();
+            }
         }
         SyncProgress syncProgressView0 = new SyncProgress(syncedSize, analyseSize, syncedFileCount, analyseFileCount,
                 totalDestSize);
+        SyncStatusEnum finalStatus = SyncStatusEnum.resolveOrigin(taskStatusOrgin);
+        syncProgressView0.setStatus(finalStatus);
         this.syncProgressView = syncProgressView0;
         return syncProgressView0;
     }
@@ -277,5 +295,4 @@ public class SyncTask implements Runnable {
         this.specs = specs;
     }
 
-    
 }

@@ -43,6 +43,21 @@ public class OssObjectAdapter implements ObjectAdapter<OssObject> {
 			throw new FileException(e);
 		}
 	}
+	public void createFile(OssObject object) throws FileException {
+
+		try {
+			String bucketName = object.getBucketName();
+			String key = object.getKey();
+			String keySuffixWithSlash = key;
+			OSS client = object.getOss();
+			client.putObject(bucketName, keySuffixWithSlash, new ByteArrayInputStream(new byte[0]));
+		} catch (Exception e) {
+			throw new FileException(e);
+		}
+	}
+
+
+
 
 	public boolean isDir(String uri) {
 
@@ -120,8 +135,9 @@ public class OssObjectAdapter implements ObjectAdapter<OssObject> {
 	}
 
     public void remove(OssObject object) {
-        // TODO Auto-generated method stub
-        
+		String key = object.getKey();
+		String bucketName = object.getBucketName();
+		object.getOss().deleteObject(bucketName, key);
     }
 
 }

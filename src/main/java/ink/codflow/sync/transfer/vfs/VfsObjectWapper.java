@@ -40,26 +40,24 @@ public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
 	public VfsObjectWapper(FileObject fileObject, ClientEndpoint<FileObject> endpoint) {
 		super(fileObject, endpoint);
 		FileName name = fileObject.getName();
-		
-		if (name instanceof WindowsFileName) {
-		    WindowsFileName windowsFileName = (WindowsFileName)name;
-		    String uri = windowsFileName.getURI();
-		    uri=uri.substring(8);
-		    this.setUri(uri);
-        }else {
-            String uri = fileObject.getName().getPath();
-            this.setUri(uri);
 
-        }
-		
+		if (name instanceof WindowsFileName) {
+			WindowsFileName windowsFileName = (WindowsFileName) name;
+			String uri = windowsFileName.getURI();
+			uri = uri.substring(8);
+			this.setUri(uri);
+		} else {
+			String uri = fileObject.getName().getPath();
+			this.setUri(uri);
+
+		}
+
 	}
 
 	@Override
 	public void copyFrom(AbstractObjectWapper<?> objectWapper) throws FileException {
 		doCopyFromWithTimeStamp(objectWapper);
 	}
-
-
 
 	@Override
 	public boolean doIsDir() throws FileException {
@@ -141,11 +139,11 @@ public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
 	@Override
 	public boolean isDiff(AbstractObjectWapper<?> abstractObjectWapper) throws FileException {
 
-		Object  destObject= abstractObjectWapper.getObject();
-		Object  srcObject= this.getObject();
-		
+		Object destObject = abstractObjectWapper.getObject();
+		Object srcObject = this.getObject();
+
 		@SuppressWarnings("rawtypes")
-		ObjectManipulationAdapter adapter =getObjectManipulationAdapter(srcObject.getClass(), destObject.getClass());
+		ObjectManipulationAdapter adapter = getObjectManipulationAdapter(srcObject.getClass(), destObject.getClass());
 		return adapter.checkDiff(srcObject, destObject);
 
 	}
@@ -205,14 +203,31 @@ public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
 		}
 	}
 
-    @Override
-    public void remove() throws FileException {
-        FileObject object = this.getObject();
-        try {
-            object.deleteAll();
-        } catch (FileSystemException e) {
-            throw new FileException();
-        }
-    }
+	@Override
+	public void remove() throws FileException {
+		FileObject object = this.getObject();
+		try {
+			object.deleteAll();
+		} catch (FileSystemException e) {
+			throw new FileException();
+		}
+	}
+
+	public void create() throws FileException {
+		try {
+			FileObject object = this.getObject();
+			if (isDir()) {
+				object.createFolder();
+
+			} else {
+				object.createFile();
+
+			}
+		} catch (FileSystemException | FileException e) {
+			e.printStackTrace();
+			throw new FileException(e);
+		}
+
+	}
 
 }

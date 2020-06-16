@@ -64,6 +64,8 @@ public class SyncFileWorkerHandler extends AbstractWorkerHandler implements Work
                     long objectSize = countSize(srcObject, listener);
                     totalSize += objectSize;
                 }
+                listener.doRecordFile(srcObject);
+
             }
             checkAfterAnalyse(srcObject, destObject);
         } catch (FileException e) {
@@ -106,6 +108,7 @@ public class SyncFileWorkerHandler extends AbstractWorkerHandler implements Work
                             AbstractObjectWapper<?> destElement0 = destObject.createChild(srcBaseName, false);
 
                             doCopy(srcElement, destElement0, listener);
+
                             checkAfterSync(srcObject, destObject);
                         } else {
                             AbstractObjectWapper<?> destElement0 = destObject.createChild(srcBaseName, true);

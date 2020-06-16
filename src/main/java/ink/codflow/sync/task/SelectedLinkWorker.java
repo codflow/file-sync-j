@@ -48,10 +48,12 @@ public class SelectedLinkWorker extends LinkWorker {
 		List<SimpleObject> selectedList0 = getSelectedList();
 		for (SimpleObject simpleObject : selectedList0) {
 			String path = simpleObject.getPath();
+
 			boolean isDir = simpleObject.isDir();
 			try {
 				AbstractObjectWapper<?> srcWapper = srcObject.createChild(path, isDir);
-				AbstractObjectWapper<?> destWapper = destObject.createChild(path, isDir);
+				String baseName = srcWapper.getBaseFileName();
+				AbstractObjectWapper<?> destWapper = destObject.createChild(baseName, isDir);
 				super.doSync(srcWapper, destWapper);
 			} catch (FileException e) {
 				logger.error("sync file failed", e);

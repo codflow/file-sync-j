@@ -3,6 +3,7 @@ package ink.codflow.sync.task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ink.codflow.sync.consts.SyncStatusEnum;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.SyncProgress;
 import ink.codflow.sync.core.handler.WorkerHandler;
@@ -32,7 +33,7 @@ public class LinkWorker {
 		this.destObject = destObject;
 	}
 
-	public SyncProgress analyse() {
+	public SyncProgress analyse() throws FileException {
 
 		return this.analyse(this.srcObject, this.destObject);
 	}
@@ -42,7 +43,13 @@ public class LinkWorker {
 		return this.sync(this.srcObject, this.destObject);
 	}
 
-	public SyncProgress analyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
+
+
+
+
+
+	public SyncProgress analyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject)
+			throws FileException {
 
 		if (srcObject == null) {
 			this.srcObject = srcObject;
@@ -51,12 +58,18 @@ public class LinkWorker {
 			this.destObject = destObject;
 		}
 		// TODO check not null
+
+
+
 		doAnalyse(this.srcObject, this.destObject);
 		return progress;
 	}
 
 	protected long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
-		return workerHandler.doAnalyse(srcObject, destObject, new AnalyseListener());
+		AnalyseListener listener = new AnalyseListener();
+
+		listener.checkAndUpdateAnalyseStatus();
+		return workerHandler.doAnalyse(srcObject, destObject, listener);
 
 	}
 
@@ -67,15 +80,18 @@ public class LinkWorker {
 		if (destObject == null) {
 			this.destObject = destObject;
 		}
+
+		
 		doSync(srcObject, destObject);
 		return this.progress;
 	}
 
 	// src object type: dir,file ;dest object type: dir,file
 	protected void doSync(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
-	    
-	    
-		workerHandler.doSync(srcObject, destObject, new SyncListener(),specs);
+		SyncListener listener =  new SyncListener();
+		listener.checkAndUpdateSyncStatus();
+		workerHandler.doSync(srcObject, destObject, listener,specs);
+		listener.doneWithSyncStatus();
 	}
 
 	public class SyncListener {
@@ -113,6 +129,20 @@ public class LinkWorker {
 			progress.increaseSyncedFileCount();
 		}
 
+
+		public void  checkAndUpdateSyncStatus(){
+			if (!SyncStatusEnum.SYNC.equals(progress.getStatus())) {
+				progress.setStatus(SyncStatusEnum.SYNC);
+			}
+			;
+		}
+
+		public void  doneWithSyncStatus(){
+			if (!SyncStatusEnum.DONE.equals(progress.getStatus())) {
+				progress.setStatus(SyncStatusEnum.DONE);
+			}
+		}
+
 	}
 
 	public class AnalyseListener {
@@ -122,6 +152,20 @@ public class LinkWorker {
 			long size = srcObject.getSize();
 			recordAnalyseFileSize(size);
 			recordAnalyseFileCount();
+		}
+
+		public void doRecordFile(AbstractObjectWapper<?> srcObject) throws FileException {
+
+			long size = srcObject.getSize();
+			progress.addTotalDestSize(size);
+		}
+
+
+		public void  checkAndUpdateAnalyseStatus(){
+			if (!SyncStatusEnum.ANALYSE.equals(progress.getStatus())) {
+				progress.setStatus(SyncStatusEnum.ANALYSE);
+			}
+			;
 		}
 
 		void recordAnalyseFileSize(long size) {

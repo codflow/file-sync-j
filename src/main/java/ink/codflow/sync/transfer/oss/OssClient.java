@@ -94,18 +94,18 @@ public class OssClient implements Client<OssObject> {
 		OssObject ossObject = new OssObject();
 
 		
-		if (!key.isEmpty()) {
-			SimplifiedObjectMeta meta = client.getSimplifiedObjectMeta(bucketName0, key);
-			long size = meta.getSize();
-			String eTag = meta.getETag();
-			Date lastMod = meta.getLastModified();
-			ossObject.setSize(size);
-			ossObject.seteTag(eTag);
-			ossObject.setLastModified(lastMod);
-		}else {
-			ossObject.setSize(0);
+		// if (!key.isEmpty()) {
+		// 	SimplifiedObjectMeta meta = client.getSimplifiedObjectMeta(bucketName0, key);
+		// 	long size = meta.getSize();
+		// 	String eTag = meta.getETag();
+		// 	Date lastMod = meta.getLastModified();
+		// 	ossObject.setSize(size);
+		// 	ossObject.seteTag(eTag);
+		// 	ossObject.setLastModified(lastMod);
+		// }else {
+		// 	ossObject.setSize(0);
 
-		}
+		// }
 		ossObject.setBucketName(bucketName0);
 		ossObject.setKey(key);
 		ossObject.setUri("/"+key);
@@ -121,6 +121,12 @@ public class OssClient implements Client<OssObject> {
 	@Override
 	public AbstractObjectWapper<OssObject> resolveWapper(String uri) {
 		OssObjectWapper objectWapper = new OssObjectWapper(uri);
+		// if(this.client.doesObjectExist(bucketName, uri, false)){
+		// 	int length = uri.length();
+		// 	if (uri.charAt(length-1)!= '/') {
+				
+		// 	}
+		// };
 		return objectWapper;
 	}
 

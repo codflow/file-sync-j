@@ -63,10 +63,10 @@ public class Vfs2OssObjectManiputationAdapter implements ObjectManipulationAdapt
 			InputStream inputStream = srcFile.getContent().getInputStream();
 
 			OSS ossClient = destFile.getOss();
-			ossClient.putObject(bucket, key, inputStream);
+			//ossClient.putObject(bucket, key, inputStream);
 			PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, key, inputStream);
-			ObjectMetadata metadata = new ObjectMetadata();
-			putObjectRequest.setMetadata(metadata);
+			//ObjectMetadata metadata = new ObjectMetadata();
+			//putObjectRequest.setMetadata(metadata);
 			ossClient.putObject(putObjectRequest);
 
 		} catch (FileSystemException e) {

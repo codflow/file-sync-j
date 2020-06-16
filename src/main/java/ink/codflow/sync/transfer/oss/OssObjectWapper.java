@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.ClientEndpoint;
-import ink.codflow.sync.core.adapter.ObjectAdapter;
 import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.transfer.Client;
 
@@ -95,6 +94,7 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 		if (isDir) {
 			object.setSize(0);
 		}
+
 		OssObject obj0 = getObject();
 		String bucket0 = obj0.getBucketName();
 		String key0 = obj0.getKey();
@@ -147,5 +147,15 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
         OBJECT_ADAPTER.remove(object);
         
     }
+
+	@Override
+	public void create() throws FileException {
+		OssObject object = this.getObject();
+		if (this.isDir()) {
+			OBJECT_ADAPTER.createDir(object);
+		}else{
+			OBJECT_ADAPTER.createFile(object);
+		}
+	}
 
 }
