@@ -40,6 +40,6 @@ Start the program in java environment.
 
     There are two modes supported now:
     
-    SYNC: keep keep destination endpoint as same as source enpoint
+    SYNC: keep destination endpoint as same as source enpoint
 
     INC: fetch new file from source to destination but not delete files which removed
