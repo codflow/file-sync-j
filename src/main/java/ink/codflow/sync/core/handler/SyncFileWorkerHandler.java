@@ -106,9 +106,7 @@ public class SyncFileWorkerHandler extends AbstractWorkerHandler implements Work
                         if (srcElement.isFile()) {
                             // TODO compare ts
                             AbstractObjectWapper<?> destElement0 = destObject.createChild(srcBaseName, false);
-
                             doCopy(srcElement, destElement0, listener);
-
                             checkAfterSync(srcObject, destObject);
                         } else {
                             AbstractObjectWapper<?> destElement0 = destObject.createChild(srcBaseName, true);

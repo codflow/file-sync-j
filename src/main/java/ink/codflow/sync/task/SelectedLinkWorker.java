@@ -30,8 +30,8 @@ public class SelectedLinkWorker extends LinkWorker {
 			boolean isDir = simpleObject.isDir();
 			try {
 				AbstractObjectWapper<?> srcWapper = srcObject.createChild(path, isDir);
-				
-				AbstractObjectWapper<?> destWapper = destObject.createChild(path, isDir);
+				String baseName = srcWapper.getBaseFileName();
+				AbstractObjectWapper<?> destWapper = destObject.createChild(baseName, isDir);
 				size += super.doAnalyse(srcWapper, destWapper);
 			} catch (FileException e) {
 				logger.error("resolve file failed", e);
