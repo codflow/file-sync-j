@@ -211,4 +211,5 @@ public abstract class AbstractObjectWapper<T> {
 	public abstract void remove()  throws FileException ;
 	public abstract void create() throws FileException;
 
+	public abstract void setTimeStamp(long timestamp) throws FileException ;
 }

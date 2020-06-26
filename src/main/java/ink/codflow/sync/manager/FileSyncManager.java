@@ -12,6 +12,7 @@ import ink.codflow.sync.bo.ClientEndpointBO;
 import ink.codflow.sync.bo.LinkBO;
 import ink.codflow.sync.bo.ObjectBO;
 import ink.codflow.sync.bo.TaskBO;
+import ink.codflow.sync.consts.AuthDataType;
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.ClientEndpoint;
@@ -98,23 +99,27 @@ public class FileSyncManager {
 
 	public List<ObjectBO> listEndpointContent(ClientEndpointBO endpointBO, String uri) throws FileException {
 		ClientEndpoint<?> clientEndpoint = conductor.getEndpoint(endpointBO);
-		List<AbstractObjectWapper<?>> wappers = clientEndpoint.list(uri);
-		List<ObjectBO> objectBOList = new ArrayList<ObjectBO>();
-		for (AbstractObjectWapper<?> abstractObjectWapper : wappers) {
-			String fileName = abstractObjectWapper.getBaseFileName();
-			String uri0 = abstractObjectWapper.getUri();
-			boolean file = abstractObjectWapper.isFile();
-			ObjectBO objectBO = new ObjectBO();
-			objectBO.setName(fileName);
-			objectBO.setFile(file);
-			if (file) {
-				long size = abstractObjectWapper.getSize();
-				objectBO.setSize(size);
+		AbstractObjectWapper<?> rootWapper = clientEndpoint.resolve(uri);
+		if(rootWapper.isExist()){
+			List<AbstractObjectWapper<?>> wappers = clientEndpoint.list(uri);
+			List<ObjectBO> objectBOList = new ArrayList<ObjectBO>();
+			for (AbstractObjectWapper<?> abstractObjectWapper : wappers) {
+				String fileName = abstractObjectWapper.getBaseFileName();
+				String uri0 = abstractObjectWapper.getUri();
+				boolean file = abstractObjectWapper.isFile();
+				ObjectBO objectBO = new ObjectBO();
+				objectBO.setName(fileName);
+				objectBO.setFile(file);
+				if (file) {
+					long size = abstractObjectWapper.getSize();
+					objectBO.setSize(size);
+				}
+				objectBO.setUri(uri0);
+				objectBOList.add(objectBO);
 			}
-			objectBO.setUri(uri0);
-			objectBOList.add(objectBO);
+			return objectBOList;
 		}
-		return objectBOList;
+		return new ArrayList<>();
 	}
 
 	public List<String> listBucket(ClientEndpointBO clientEndpointBO) throws FileException {
@@ -127,8 +132,12 @@ public class FileSyncManager {
 			OssClient client0 = (OssClient) client;
 			List<Bucket> buckets = client0.getClient().listBuckets();
 			for (Bucket bucket : buckets) {
-				String bucketName = bucket.getName();
-				bucketNameList.add(bucketName);
+				String exEndpoint = bucket.getExtranetEndpoint();
+				if (exEndpoint != null && exEndpoint.equals(clientEndpointBO.getAuthenticationBO().getParam(AuthDataType.HOST))) {
+					String bucketName = bucket.getName();
+					bucketNameList.add(bucketName);
+				}
+
 			}
 			return bucketNameList;
 		}

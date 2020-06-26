@@ -24,6 +24,7 @@ import ink.codflow.sync.transfer.Client;
 
 public class SftpVfsClient implements Client<FileObject> {
 
+	public static final int DEFAULT_TIMEOUT = 1000*60;
 	public static final ClientTypeEnum TYPE = ClientTypeEnum.SFTP;
 
 	boolean remote = true;
@@ -59,6 +60,8 @@ public class SftpVfsClient implements Client<FileObject> {
 		try {
 			DefaultFileSystemConfigBuilder.getInstance().setUserAuthenticator(opts, auth);
 			SftpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(opts, false);
+			SftpFileSystemConfigBuilder.getInstance().setSessionTimeoutMillis(opts, DEFAULT_TIMEOUT);
+			SftpFileSystemConfigBuilder.getInstance().setConnectTimeoutMillis(opts, DEFAULT_TIMEOUT);
 
 		} catch (FileSystemException e) {
 			throw new FileException(e);

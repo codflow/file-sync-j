@@ -3,6 +3,7 @@ package ink.codflow.sync.core.handler;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +11,9 @@ import org.slf4j.LoggerFactory;
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.consts.TaskSpecType;
 import ink.codflow.sync.core.AbstractObjectWapper;
+import ink.codflow.sync.exception.BackupInterruptException;
 import ink.codflow.sync.exception.FileException;
+import ink.codflow.sync.exception.RemotingException;
 import ink.codflow.sync.task.LinkWorker;
 import ink.codflow.sync.task.TaskSpecs;
 import ink.codflow.sync.task.LinkWorker.AnalyseListener;
@@ -72,6 +75,7 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
                 // record total size
                 listener.doRecordFile(srcObject);
             }
+
             checkAfterAnalyse(srcObject, destObject);
         } catch (FileException e) {
             log.error("analyse error", e);
@@ -110,61 +114,81 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
             long expire) {
 
         try {
-            Map<String, ?> destMap = (destObject != null && destObject.isExist() && destObject.isDir())
+
+            boolean isDir = (destObject != null && destObject.isExist() && destObject.isDir());
+            if (isDir) {
+                long timestamp = System.currentTimeMillis();
+                destObject.setTimeStamp(timestamp);
+            }
+            Map<String, ?> destMap = isDir
                     ? destObject.mapChildren()
                     : null;
+            if (srcObject.isExist()) {
 
-            if (srcObject.isDir()) {
+                if (srcObject.isDir()) {
 
-                List<?> srcList = srcObject.listChildren();
+                    List<?> srcList = srcObject.listChildren();
 
-                for (int i = 0; i < srcList.size(); i++) {
-                    AbstractObjectWapper<?> srcElement = (AbstractObjectWapper<?>) srcList.get(i);
-                    String srcBaseName = srcElement.getBaseFileName();
-                    if (destMap != null && destMap.containsKey(srcBaseName)) {
+                    for (int i = 0; i < srcList.size(); i++) {
+                        AbstractObjectWapper<?> srcElement = (AbstractObjectWapper<?>) srcList.get(i);
+                        String srcBaseName = srcElement.getBaseFileName();
+                        if (destMap != null && destMap.containsKey(srcBaseName)) {
 
-                        AbstractObjectWapper<?> destElement = (AbstractObjectWapper<?>) destMap.get(srcBaseName);
-                        doSync(srcElement, destElement, listener);
-                        destMap.remove(srcBaseName);
-                    } else {
-                        //
-                        if (srcElement.isFile()) {
-                            // TODO compare ts
-                            AbstractObjectWapper<?> destElement0 = destObject.createChild(srcBaseName, false);
-
-                            doCopy(srcElement, destElement0, listener);
-                            checkAfterSync(srcObject, destObject);
+                            AbstractObjectWapper<?> destElement = (AbstractObjectWapper<?>) destMap.get(srcBaseName);
+                            doSync(srcElement, destElement, listener);
+                            destMap.remove(srcBaseName);
                         } else {
-                            AbstractObjectWapper<?> destElement0 = destObject.createChild(srcBaseName, true);
-                            doSync(srcElement, destElement0, listener);
+                            //
+                            if (srcElement.isFile()) {
+                                // TODO compare ts
+                                AbstractObjectWapper<?> destElement0 = destObject.createChild(srcBaseName, false);
+                                log.debug("copy:" + srcBaseName);
+                                doCopy(srcElement, destElement0, listener);
+                                checkAfterSync(srcObject, destObject);
+                            } else {
+                                AbstractObjectWapper<?> destElement0 = destObject.createChild(srcBaseName, true);
+                                doSync(srcElement, destElement0, listener);
+                            }
                         }
                     }
-                }
-            } else if (srcObject.isFile()) {
-                String srcBaseName = srcObject.getBaseFileName();
-                if (!destObject.isExist() || ((destMap == null && isDiffFile(srcObject, destObject)))
-                        || (destMap != null && !destMap.containsKey(srcBaseName))) {
-                    doCopy(srcObject, destObject, listener);
+                } else if (srcObject.isFile()) {
+                    String srcBaseName = srcObject.getBaseFileName();
+                    if (!destObject.isExist() || ((destMap == null && isDiffFile(srcObject, destObject)))
+                            || (destMap != null && !destMap.containsKey(srcBaseName))) {
+                        log.debug("copy:" + srcBaseName);
+                        doCopy(srcObject, destObject, listener);
+                    }
                 }
             }
-
             doProcessRemainDestFile(destMap, expire);
         } catch (FileException e) {
-            log.error("analyse error", e);
+            String msg = e.getMessage();
+            if (msg.contains("not close the input stream")) {
+                throw new RemotingException("connection lost");
+            }
+            log.error("sync error", e);
         }
 
     }
 
     void doProcessRemainDestFile(Map<String, ?> destMap, long expire) {
         if (destMap != null) {
+
             Collection<?> objects = destMap.values();
             for (Object object : objects) {
                 if (object instanceof AbstractObjectWapper<?>) {
                     AbstractObjectWapper<?> wapper = (AbstractObjectWapper<?>) object;
                     try {
-                        if (doCheckExpired(wapper.getLastMod(), expire)) {
-                            wapper.remove();
+                        if (!wapper.isDir()) {
+                            if (doCheckExpired(wapper.getLastMod(), expire)) {
+                                wapper.remove();
+                                
+                            }
+                        } else {
+                            Map<String, ?> map = wapper.mapChildren();
+                            doProcessRemainDestFile(map, expire);
                         }
+
                     } catch (FileException e) {
                         log.warn("delete remaining file failed");
                     }
@@ -172,6 +196,7 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
             }
         }
     }
+
 
     public boolean doCheckExpired(long targetUnixtime, long expire) {
         long currentUnixtime = System.currentTimeMillis();

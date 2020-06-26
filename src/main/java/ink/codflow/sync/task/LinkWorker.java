@@ -69,7 +69,13 @@ public class LinkWorker {
 		AnalyseListener listener = new AnalyseListener();
 
 		listener.checkAndUpdateAnalyseStatus();
-		return workerHandler.doAnalyse(srcObject, destObject, listener);
+		try {
+			if(srcObject.isExist()){
+				return workerHandler.doAnalyse(srcObject, destObject, listener);
+			};
+		} catch (FileException e) {
+		}
+		return 0;
 
 	}
 
@@ -90,8 +96,13 @@ public class LinkWorker {
 	protected void doSync(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
 		SyncListener listener =  new SyncListener();
 		listener.checkAndUpdateSyncStatus();
-		workerHandler.doSync(srcObject, destObject, listener,specs);
-		listener.doneWithSyncStatus();
+		try {
+			workerHandler.doSync(srcObject, destObject, listener,specs);
+			listener.doneWithSyncStatus();
+		} catch (Exception e) {
+			logger.error("sync failed", e);
+			listener.failedWithSyncStatus();
+		}
 	}
 
 	public class SyncListener {
@@ -140,6 +151,12 @@ public class LinkWorker {
 		public void  doneWithSyncStatus(){
 			if (!SyncStatusEnum.DONE.equals(progress.getStatus())) {
 				progress.setStatus(SyncStatusEnum.DONE);
+			}
+		}
+
+		public void  failedWithSyncStatus(){
+			if (!SyncStatusEnum.FAILED.equals(progress.getStatus())) {
+				progress.setStatus(SyncStatusEnum.FAILED);
 			}
 		}
 

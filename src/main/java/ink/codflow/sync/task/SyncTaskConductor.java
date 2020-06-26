@@ -133,9 +133,10 @@ public class SyncTaskConductor {
     public boolean checkAndTryCancle(String traceId) {
         SyncTask task = cacheMap.get(traceId);
         SyncStatusEnum status = task.getSyncProgressView().getStatus();
-        if (SyncStatusEnum.DONE.equals(status)&& SyncStatusEnum.FAILD.equals(status)) {
+        if (SyncStatusEnum.DONE.equals(status)&& SyncStatusEnum.FAILED.equals(status)) {
             return true;
         }
+    
         return false;
     }
     

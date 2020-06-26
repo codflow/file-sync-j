@@ -158,4 +158,10 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 		}
 	}
 
+	@Override
+	public void setTimeStamp(long timestamp) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

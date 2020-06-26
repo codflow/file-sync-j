@@ -31,7 +31,7 @@ public class Vfs2VfsObjectManipulationAdapter implements ObjectManipulationAdapt
 			srcType = src.getType();
 			destType = dest.getType();
 		} catch (FileSystemException e) {
-			throw new FileException();
+			throw new FileException(e);
 		}
 		if (FileType.FILE.equals(srcType)) {
 
@@ -67,7 +67,7 @@ public class Vfs2VfsObjectManipulationAdapter implements ObjectManipulationAdapt
 			FileObjectUtils.writeContent(srcFile, destFile0);
 
 		} catch (IOException e) {
-			throw new FileException();
+			throw new FileException(e);
 		}
 
 	}
@@ -119,7 +119,7 @@ public class Vfs2VfsObjectManipulationAdapter implements ObjectManipulationAdapt
 			}
 
 		} catch (Exception e) {
-			throw new FileException();
+			throw new FileException(e);
 		}
 	}
 
@@ -134,7 +134,7 @@ public class Vfs2VfsObjectManipulationAdapter implements ObjectManipulationAdapt
 			}
 			return false;
 		} catch (FileSystemException e) {
-			throw new FileException();
+			throw new FileException(e);
 		}
 	}
 

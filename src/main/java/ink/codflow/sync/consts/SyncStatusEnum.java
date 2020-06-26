@@ -5,7 +5,7 @@ import java.util.Map;
 
 public enum SyncStatusEnum {
 
-    CREATE("CREATE"), ANALYSE("ANALYSE"), SYNC("SYNC"), DONE("DONE"), FAILD("FAILD");
+    FAILED("FAILED"),CREATE("CREATE"), ANALYSE("ANALYSE"), SYNC("SYNC"), DONE("DONE");
 
     String name;
 
@@ -24,6 +24,7 @@ public enum SyncStatusEnum {
         for (SyncStatusEnum syncStatusEnum : statusEnums) {
             MAP.put(syncStatusEnum.getName(), syncStatusEnum);
         }
+        MAP.put("FAILD", SyncStatusEnum.FAILED);
 
     }
 

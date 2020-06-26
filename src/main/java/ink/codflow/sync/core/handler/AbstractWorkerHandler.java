@@ -1,5 +1,8 @@
 package ink.codflow.sync.core.handler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.exception.FileException;
@@ -10,8 +13,11 @@ import ink.codflow.sync.task.LinkWorker.SyncListener;
 
 public abstract class AbstractWorkerHandler implements WorkerHandler {
 
+	private static final Logger log = LoggerFactory.getLogger(AbstractWorkerHandler.class);
+
 	protected void doCopy(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject,
 			SyncListener copyListener) throws FileException {
+				
 		destObject.copyFrom(srcObject);
 		if (copyListener != null) {
 			copyListener.doRecordDiff(srcObject);

@@ -23,6 +23,9 @@ import ink.codflow.sync.thread.TaskStatus;
 
 public class SyncTask implements Runnable {
 
+
+    
+
     private static final Logger log = LoggerFactory.getLogger(SyncTask.class);
 
     private static final Map<FileSyncMode, WorkerHandler> handlerMap = new HashMap<FileSyncMode, WorkerHandler>();
@@ -172,6 +175,8 @@ public class SyncTask implements Runnable {
             }
 
         } catch (Exception e) {
+         //   taskStatusListener.statusChange(getSyncProgressView(), SyncStatusEnum.FAILED);
+
             log.error("task error", e);
         }
 

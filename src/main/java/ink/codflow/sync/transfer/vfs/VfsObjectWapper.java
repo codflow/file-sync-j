@@ -230,4 +230,18 @@ public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
 
 	}
 
+	@Override
+	public void setTimeStamp(long timestamp) throws FileException {
+		try {
+			FileObject object = this.getObject();
+
+			object.getContent().setLastModifiedTime(timestamp);
+		} catch (FileSystemException | FileException e) {
+			throw new FileException(e);
+
+
+
+	}
+}
+
 }
