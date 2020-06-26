@@ -183,7 +183,7 @@ public class EndpointEditor {
 			}
 		});
 
-		JButton cancleBtn = new JButton("Cancle");
+		JButton cancleBtn = new JButton("Cancel");
 		cancleBtn.addActionListener(new ActionListener() {
 
 			@Override
