@@ -1,3 +1,0 @@
-#!/bin/sh
-
-java -jar ./file-sync-j-0.0.1-SNAPSHOT.jar "$*"

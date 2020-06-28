@@ -1,8 +1,6 @@
 package ink.codflow.sync;
 
-import java.util.concurrent.CountDownLatch;
 
-import ink.codflow.sync.api.command.CommandApi;
 import ink.codflow.sync.manager.FileSyncManager;
 import ink.codflow.sync.task.SyncTaskConductor;
 import ink.codflow.sync.ui.ExceptionHandler;
@@ -22,26 +20,5 @@ public class Application {
 
 	}
 
-	static boolean process(String[] args) {
-
-		boolean isServerMode = false;
-		CommandApi commandApi = new CommandApi();
-
-		commandApi.dispatch(args);
-
-		for (int i = 0; i < args.length; i++) {
-			switch (args[i]) {
-			case "-S":
-
-				break;
-
-			default:
-				break;
-			}
-
-		}
-
-		return false;
-	}
 
 }
