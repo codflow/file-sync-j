@@ -159,24 +159,26 @@ public class SyncTask implements Runnable {
                 linkWorker.analyse();
             }
 
+
+
             if (taskStatusListener != null) {
                 if (!taskStatusListener.statusChange(getSyncProgressView(), getSyncProgressView().getStatus())) {
                     throw new BackupInterruptException();
                 }
             }
+            if (!SyncStatusEnum.FAILED.equals(getSyncProgressView().getStatus())) {
+                for (LinkWorker linkWorker : task.workerList) {
+                    linkWorker.sync();
+                }
 
-            for (LinkWorker linkWorker : task.workerList) {
-                linkWorker.sync();
             }
-
             if (taskStatusListener != null) {
                 SyncStatusEnum status = getSyncProgressView().getStatus();
                 taskStatusListener.statusChange(getSyncProgressView(), status);
             }
 
         } catch (Exception e) {
-         //   taskStatusListener.statusChange(getSyncProgressView(), SyncStatusEnum.FAILED);
-
+            taskStatusListener.statusChange(getSyncProgressView(), SyncStatusEnum.FAILED);
             log.error("task error", e);
         }
 

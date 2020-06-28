@@ -43,9 +43,7 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
                     : null;
 
             if (srcObject.isDir()) {
-
                 List<?> srcList = srcObject.listChildren();
-
                 for (int i = 0; i < srcList.size(); i++) {
                     AbstractObjectWapper<?> srcElement = (AbstractObjectWapper<?>) srcList.get(i);
                     String srcBaseName = srcElement.getBaseFileName();
@@ -60,7 +58,6 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
                             totalSize += countSize(srcElement, listener);
                         } else {
                             AbstractObjectWapper<?> destElement0 = destObject.createChild(srcBaseName, true);
-
                             totalSize += doAnalyse(srcElement, destElement0, listener);
                         }
                     }
@@ -78,7 +75,7 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
 
             checkAfterAnalyse(srcObject, destObject);
         } catch (FileException e) {
-            log.error("analyse error", e);
+            throw new RemotingException("analyse failure",e);
         }
         return totalSize;
 
@@ -162,11 +159,10 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
             }
             doProcessRemainDestFile(destMap, expire);
         } catch (FileException e) {
-            String msg = e.getMessage();
-            if (msg.contains("not close the input stream")) {
-                throw new RemotingException("connection lost");
-            }
-            log.error("sync error", e);
+            throw new RemotingException("sync failure",e);
+            // if (msg.contains("not close the input stream")) {
+            //     throw new RemotingException("connection lost");
+            // }
         }
 
     }
@@ -182,7 +178,6 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
                         if (!wapper.isDir()) {
                             if (doCheckExpired(wapper.getLastMod(), expire)) {
                                 wapper.remove();
-                                
                             }
                         } else {
                             Map<String, ?> map = wapper.mapChildren();

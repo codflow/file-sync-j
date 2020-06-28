@@ -74,6 +74,11 @@ public class LinkWorker {
 				return workerHandler.doAnalyse(srcObject, destObject, listener);
 			};
 		} catch (FileException e) {
+			return 0;
+		}catch(Exception e){
+			logger.error("analyse failed", e);
+			listener.failedWithAnalyseStatus();
+
 		}
 		return 0;
 
@@ -84,6 +89,7 @@ public class LinkWorker {
 			this.srcObject = srcObject;
 		}
 		if (destObject == null) {
+			
 			this.destObject = destObject;
 		}
 
@@ -169,6 +175,12 @@ public class LinkWorker {
 			long size = srcObject.getSize();
 			recordAnalyseFileSize(size);
 			recordAnalyseFileCount();
+		}
+
+		public void failedWithAnalyseStatus() {
+			if (!SyncStatusEnum.FAILED.equals(progress.getStatus())) {
+				progress.setStatus(SyncStatusEnum.FAILED);
+			}
 		}
 
 		public void doRecordFile(AbstractObjectWapper<?> srcObject) throws FileException {

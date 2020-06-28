@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.exception.FileException;
+import ink.codflow.sync.exception.RemotingException;
 import ink.codflow.sync.task.LinkWorker;
 import ink.codflow.sync.task.LinkWorker.AnalyseListener;
 import ink.codflow.sync.task.LinkWorker.SyncListener;
@@ -69,7 +70,7 @@ public class SyncFileWorkerHandler extends AbstractWorkerHandler implements Work
             }
             checkAfterAnalyse(srcObject, destObject);
         } catch (FileException e) {
-            log.error("analyse error", e);
+            throw new RemotingException("analyse failure",e);
         }
         return totalSize;
 
@@ -124,7 +125,7 @@ public class SyncFileWorkerHandler extends AbstractWorkerHandler implements Work
 
             doProcessRemainDestFile(destMap);
         } catch (FileException e) {
-            log.error("analyse error", e);
+            throw new RemotingException("analyse failure",e);
         }
 
     }
@@ -144,11 +145,19 @@ public class SyncFileWorkerHandler extends AbstractWorkerHandler implements Work
             }
         }
     }
+    @Override
+    protected boolean isDiffFile(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject)
+            throws FileException {
+        long srcSize = srcObject.getSize();
+        long destSize = destObject.getSize();
+        long srcTS = srcObject.getLastMod();
+        long destTs = destObject.getLastMod();
+        return srcSize != destSize || srcTS != destTs;
+    }
 
     @Override
     public FileSyncMode syncMode() {
         return SYNC_MODE;
     }
-
 
 }
