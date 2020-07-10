@@ -54,6 +54,14 @@ public class Vfs2VfsObjectManipulationAdapter implements ObjectManipulationAdapt
 		try {
 			FileObjectUtils.writeContent(srcFile, destFile);
 		} catch (IOException e) {
+			try {
+				if (destFile.exists()) {
+					destFile.delete();
+				}
+			} catch (FileSystemException e1) {
+				throw new FileException(e);
+
+			}
 			throw new FileException(e);
 		}
 

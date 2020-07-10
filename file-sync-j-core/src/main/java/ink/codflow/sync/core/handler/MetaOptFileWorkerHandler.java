@@ -28,13 +28,13 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
 
     @Override
     public long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
-        return doAnalyse(srcObject, destObject, null);
+        return doAnalyse(srcObject, destObject, null,null);
 
     }
 
-    @Override
+ 
     public long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject,
-            AnalyseListener listener) {
+            AnalyseListener listener,long expire) {
 
         long totalSize = 0;
         try {
@@ -50,7 +50,8 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
                     if (destMap != null && destMap.containsKey(srcBaseName)) {
 
                         AbstractObjectWapper<?> destElement = (AbstractObjectWapper<?>) destMap.get(srcBaseName);
-                        totalSize += doAnalyse(srcElement, destElement, listener);
+                        totalSize += doAnalyse(srcElement, destElement, listener,expire);
+                        destMap.remove(srcBaseName);
                     } else {
                         //
                         if (srcElement.isFile()) {
@@ -58,7 +59,7 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
                             totalSize += countSize(srcElement, listener);
                         } else {
                             AbstractObjectWapper<?> destElement0 = destObject.createChild(srcBaseName, true);
-                            totalSize += doAnalyse(srcElement, destElement0, listener);
+                            totalSize += doAnalyse(srcElement, destElement0, listener,expire);
                         }
                     }
                 }
@@ -72,13 +73,12 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
                 // record total size
                 listener.doRecordFile(srcObject);
             }
-
+            doProcessRemainDestFileInAnalyse(destMap, expire,listener);
             checkAfterAnalyse(srcObject, destObject);
         } catch (FileException e) {
             throw new RemotingException("analyse failure",e);
         }
         return totalSize;
-
     }
 
     @Override
@@ -132,7 +132,7 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
                         if (destMap != null && destMap.containsKey(srcBaseName)) {
 
                             AbstractObjectWapper<?> destElement = (AbstractObjectWapper<?>) destMap.get(srcBaseName);
-                            doSync(srcElement, destElement, listener);
+                            doSync(srcElement, destElement, listener,expire);
                             destMap.remove(srcBaseName);
                         } else {
                             //
@@ -144,7 +144,7 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
                                 checkAfterSync(srcObject, destObject);
                             } else {
                                 AbstractObjectWapper<?> destElement0 = destObject.createChild(srcBaseName, true);
-                                doSync(srcElement, destElement0, listener);
+                                doSync(srcElement, destElement0, listener,expire);
                             }
                         }
                     }
@@ -154,6 +154,9 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
                             || (destMap != null && !destMap.containsKey(srcBaseName))) {
                         log.debug("copy:" + srcBaseName);
                         doCopy(srcObject, destObject, listener);
+                    }
+                    if (destObject.isExist()) {
+                        destObject.setTimeStamp(currentTimestamp());
                     }
                 }
             }
@@ -166,6 +169,33 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
         }
 
     }
+
+    void doProcessRemainDestFileInAnalyse(Map<String, ?> destMap, long expire,AnalyseListener listener) {
+        if (destMap != null) {
+
+            Collection<?> objects = destMap.values();
+            for (Object object : objects) {
+                if (object instanceof AbstractObjectWapper<?>) {
+                    AbstractObjectWapper<?> wapper = (AbstractObjectWapper<?>) object;
+                    try {
+                        if (!wapper.isDir()) {
+                            if (doCheckExpired(wapper.getLastMod(), expire)) {
+                            }else{
+                                listener.doRecordFile(wapper);
+                            }
+                        } else {
+                            Map<String, ?> map = wapper.mapChildren();
+                            doProcessRemainDestFileInAnalyse(map, expire,listener);
+                        }
+                    } catch (FileException e) {
+                        log.warn("analyse remaining file failed");
+                    }
+                }
+            }
+        }
+    }
+
+
 
     void doProcessRemainDestFile(Map<String, ?> destMap, long expire) {
         if (destMap != null) {
@@ -192,6 +222,16 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
         }
     }
 
+    @Override
+    protected boolean isDiffFile(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject)
+            throws FileException {
+        long srcSize = srcObject.getSize();
+        long destSize = destObject.getSize();
+        long srcTS = srcObject.getLastMod();
+        long destTs = destObject.getLastMod();
+        return srcSize != destSize || srcTS < destTs;
+    }
+
 
     public boolean doCheckExpired(long targetUnixtime, long expire) {
         long currentUnixtime = System.currentTimeMillis();
@@ -201,6 +241,33 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
     @Override
     public FileSyncMode syncMode() {
         return SYNC_MODE0;
+    }
+
+
+    long currentTimestamp(){
+        return System.currentTimeMillis();
+    }
+
+    @Override
+    public long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject,
+            AnalyseListener listener, TaskSpecs specs) {
+                String expireS = specs.getSpec(TaskSpecType.EXPIRE);
+                Long expire = 0L;
+				if (expireS != null) {
+					try {
+						expire = 	Long.valueOf(expire);
+					} catch (Exception e) {
+                        log.error("expire num parse failed", e);
+					}
+				}
+        return doAnalyse(srcObject,destObject,listener,expire);
+    }
+
+    @Override
+    public long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject,
+            AnalyseListener listener) {
+                
+        return  doAnalyse(srcObject,destObject,listener,0);
     }
 
 }

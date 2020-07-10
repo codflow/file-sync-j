@@ -145,4 +145,13 @@ public class FileSyncManager {
 		throw new FileException("Wrong oss client arguments!");
 	}
 
+	public boolean testClientWithBK(ClientEndpointBO clientEndpointBO) {
+		try {
+			listEndpointContent(clientEndpointBO,"/");
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 }

@@ -71,7 +71,7 @@ public class LinkWorker {
 		listener.checkAndUpdateAnalyseStatus();
 		try {
 			if(srcObject.isExist()){
-				return workerHandler.doAnalyse(srcObject, destObject, listener);
+				return workerHandler.doAnalyse(srcObject, destObject, listener,specs);
 			};
 		} catch (FileException e) {
 			return 0;

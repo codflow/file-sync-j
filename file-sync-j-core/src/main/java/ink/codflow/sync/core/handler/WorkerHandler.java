@@ -10,6 +10,8 @@ public interface WorkerHandler {
 
 	long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject);
 
+	long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject, AnalyseListener listener,TaskSpecs specs);
+
 	long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject, AnalyseListener listener);
 
 	void doSync(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject);

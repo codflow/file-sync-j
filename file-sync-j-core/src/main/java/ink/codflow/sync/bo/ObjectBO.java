@@ -7,7 +7,7 @@ public class ObjectBO {
     
     int linkId;
     
-    boolean file;
+    Boolean file;
     
     String uri;
     

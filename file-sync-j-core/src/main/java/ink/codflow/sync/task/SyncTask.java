@@ -128,7 +128,7 @@ public class SyncTask implements Runnable {
                 for (ObjectBO objectBO : objectUriBOs) {
 
                     String uri = objectBO.getUri();
-                    boolean file = objectBO.isFile();
+                    boolean file = objectBO.getFile();
 
                     SimpleObject simpleObject = new SimpleObject();
                     simpleObject.setDir(!file);

@@ -12,6 +12,7 @@ import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.exception.RemotingException;
 import ink.codflow.sync.task.LinkWorker;
+import ink.codflow.sync.task.TaskSpecs;
 import ink.codflow.sync.task.LinkWorker.AnalyseListener;
 import ink.codflow.sync.task.LinkWorker.SyncListener;
 
@@ -22,11 +23,20 @@ public class SyncFileWorkerHandler extends AbstractWorkerHandler implements Work
 
     @Override
     public long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject) {
-        return doAnalyse(srcObject, destObject, null);
+        return doAnalyse(srcObject, destObject, null,null);
 
     }
 
     @Override
+    public long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject,
+            AnalyseListener listener,TaskSpecs specs){
+
+                return doAnalyse(srcObject,destObject,listener);
+            }
+
+
+
+    
     public long doAnalyse(AbstractObjectWapper<?> srcObject, AbstractObjectWapper<?> destObject,
             AnalyseListener listener) {
 
@@ -129,6 +139,9 @@ public class SyncFileWorkerHandler extends AbstractWorkerHandler implements Work
         }
 
     }
+
+    
+
 
     void doProcessRemainDestFile(Map<String, ?> destMap) {
         if (destMap != null) {
