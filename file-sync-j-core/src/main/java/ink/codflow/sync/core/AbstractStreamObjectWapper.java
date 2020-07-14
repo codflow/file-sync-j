@@ -6,6 +6,8 @@ public abstract class AbstractStreamObjectWapper<T> extends AbstractObjectWapper
         super(uri, endpoint);
     }
 
+    protected AbstractStreamObjectWapper(T object, ClientEndpoint<T> endpoint) {
+		super(object, endpoint);
+	}
 
-    
 }

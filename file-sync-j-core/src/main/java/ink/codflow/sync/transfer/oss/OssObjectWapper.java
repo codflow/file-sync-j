@@ -1,5 +1,6 @@
 package ink.codflow.sync.transfer.oss;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,11 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ink.codflow.sync.core.AbstractObjectWapper;
+import ink.codflow.sync.core.AbstractStreamObjectWapper;
 import ink.codflow.sync.core.ClientEndpoint;
 import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.transfer.Client;
 
-public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
+public class OssObjectWapper extends AbstractStreamObjectWapper<OssObject> {
 
 	private static final Logger log = LoggerFactory.getLogger(OssObjectWapper.class);
 
@@ -89,7 +91,7 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 	}
 
 	@Override
-	public AbstractObjectWapper<OssObject> createChild(String srcBaseName,boolean isDir) throws FileException {
+	public AbstractObjectWapper<OssObject> createChild(String srcBaseName, boolean isDir) throws FileException {
 		OssObject object = new OssObject();
 		if (isDir) {
 			object.setSize(0);
@@ -99,15 +101,15 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 		String bucket0 = obj0.getBucketName();
 		String key0 = obj0.getKey();
 		object.setOss(obj0.getOss());
-		
+
 		StringBuilder keySB = new StringBuilder(key0).append(srcBaseName);
-		
+
 		if (isDir) {
 			keySB.append("/");
 		}
 		object.setKey(keySB.toString());
 		object.setBucketName(bucket0);
-		String uri = isDir?  getUri() + srcBaseName + "/" :  getUri() + srcBaseName ;
+		String uri = isDir ? getUri() + srcBaseName + "/" : getUri() + srcBaseName;
 		object.setUri(uri);
 		OssObjectWapper objectWapper = new OssObjectWapper(object, getEndpoint());
 		objectWapper.setUri(uri);
@@ -138,28 +140,40 @@ public class OssObjectWapper extends AbstractObjectWapper<OssObject> {
 
 		OssObject object = this.getObject();
 		return OBJECT_ADAPTER.checkExist(object);
-		
+
 	}
 
-    @Override
-    public void remove() throws FileException {
-        OssObject object = this.getObject();
-        OBJECT_ADAPTER.remove(object);
-        
-    }
+	@Override
+	public void remove() throws FileException {
+		OssObject object = this.getObject();
+		OBJECT_ADAPTER.remove(object);
+
+	}
 
 	@Override
 	public void create() throws FileException {
 		OssObject object = this.getObject();
 		if (this.isDir()) {
 			OBJECT_ADAPTER.createDir(object);
-		}else{
+		} else {
 			OBJECT_ADAPTER.createFile(object);
 		}
 	}
 
 	@Override
 	public void setTimeStamp(long timestamp) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public InputStream fileInputStream() throws FileException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void copyContentFrom(InputStream in) throws FileException {
 		// TODO Auto-generated method stub
 
 	}
