@@ -1,5 +1,6 @@
 package ink.codflow.sync.transfer.vfs;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,10 +11,12 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.provider.local.WindowsFileName;
+import org.apache.commons.vfs2.util.RandomAccessMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ink.codflow.sync.core.AbstractObjectWapper;
+import ink.codflow.sync.core.AbstractStreamObjectWapper;
 import ink.codflow.sync.core.ClientEndpoint;
 import ink.codflow.sync.core.adapter.ObjectAdapter;
 import ink.codflow.sync.core.adapter.ObjectManipulationAdapter;
@@ -21,7 +24,7 @@ import ink.codflow.sync.core.adapter.Vfs2VfsObjectManipulationAdapter;
 import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.transfer.Client;
 
-public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
+public class VfsObjectWapper extends AbstractStreamObjectWapper<FileObject> {
 
 	private static final Logger log = LoggerFactory.getLogger(VfsObjectWapper.class);
 
@@ -239,9 +242,35 @@ public class VfsObjectWapper extends AbstractObjectWapper<FileObject> {
 		} catch (FileSystemException | FileException e) {
 			throw new FileException(e);
 
-
-
+		}
 	}
-}
+
+	@Override
+	public InputStream fileInputStream() throws FileException {
+		FileObject object = this.getObject();
+
+		try {
+			return object.getContent().getInputStream();
+		} catch (FileSystemException e) {
+			throw new FileException(e);
+		}
+	}
+
+	@Override
+	public void copyContentFrom(InputStream in) throws FileException {
+		FileObject object = this.getObject();
+		
+		if (!isExist()) {
+			if (isFile()) {
+				try {
+					object.createFile();
+					object.getContent().getOutputStream();
+
+				} catch (FileSystemException e) {
+				
+				}
+			}
+		}
+	}
 
 }

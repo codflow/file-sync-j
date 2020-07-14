@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.model.OSSObject;
+import com.aliyun.oss.model.PutObjectRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,20 +164,38 @@ public class OssObjectWapper extends AbstractStreamObjectWapper<OssObject> {
 		}
 	}
 
-	@Override
-	public void setTimeStamp(long timestamp) {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public InputStream fileInputStream() throws FileException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		OssObject object = this.getObject();
+		String bucketName = object.getBucketName();
+		String key = object.getKey();
+		OSS oss = object.getOss();
+		OSSObject ossObject = oss.getObject(bucketName, key);
+		InputStream in = ossObject.getObjectContent();
+		return in;
 	}
+
+
 
 	@Override
 	public void copyContentFrom(InputStream in) throws FileException {
+
+		//TODO add large file support
+		OssObject object = this.getObject();
+		String bucketName = object.getBucketName();
+		String key = object.getKey();
+		OSS ossClient = object.getOss();
+		// ossClient.putObject(bucket, key, inputStream);
+		PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, in);
+		// ObjectMetadata metadata = new ObjectMetadata();
+		// putObjectRequest.setMetadata(metadata);
+		ossClient.putObject(putObjectRequest);
+	}
+
+	@Override
+	public void setTimeStamp(long timestamp) throws FileException {
 		// TODO Auto-generated method stub
 
 	}
