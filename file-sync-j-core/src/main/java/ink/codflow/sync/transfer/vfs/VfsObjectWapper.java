@@ -1,6 +1,8 @@
 package ink.codflow.sync.transfer.vfs;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,10 +13,10 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.provider.local.WindowsFileName;
-import org.apache.commons.vfs2.util.RandomAccessMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ink.codflow.sync.consts.ObjectType;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.AbstractStreamObjectWapper;
 import ink.codflow.sync.core.ClientEndpoint;
@@ -27,6 +29,8 @@ import ink.codflow.sync.transfer.Client;
 public class VfsObjectWapper extends AbstractStreamObjectWapper<FileObject> {
 
 	private static final Logger log = LoggerFactory.getLogger(VfsObjectWapper.class);
+
+	private static final int BLOCK_SIZE = 1024 * 1024 * 10;
 
 	static final ObjectAdapter<FileObject> OBJECT_ADAPTER = new VfsObjectAdapter();
 
@@ -163,7 +167,7 @@ public class VfsObjectWapper extends AbstractStreamObjectWapper<FileObject> {
 	}
 
 	@Override
-	public AbstractObjectWapper<FileObject> createChild(String srcBaseName, boolean isDir) throws FileException {
+	public AbstractStreamObjectWapper<FileObject> createChild(String srcBaseName, boolean isDir) throws FileException {
 		FileObject newChild;
 		try {
 			newChild = this.getObject().resolveFile(srcBaseName);
@@ -259,17 +263,80 @@ public class VfsObjectWapper extends AbstractStreamObjectWapper<FileObject> {
 	@Override
 	public void copyContentFrom(InputStream in) throws FileException {
 		FileObject object = this.getObject();
-		
+
+		OutputStream out = null;
 		if (!isExist()) {
 			if (isFile()) {
 				try {
 					object.createFile();
-					object.getContent().getOutputStream();
+					out = object.getContent().getOutputStream();
+					int rd = 0;
+					byte[] bufferBlock = new byte[BLOCK_SIZE];
+					while (in.available() > 0 && rd >= 0) {
 
-				} catch (FileSystemException e) {
-				
+						int ava = in.available();
+						if (ava > BLOCK_SIZE) {
+							rd = in.read(bufferBlock);
+							out.write(bufferBlock);
+						} else {
+							byte[] bf = new byte[ava];
+							rd = in.read(bf);
+							out.write(bf);
+						}
+					}
+					out.flush();
+				} catch (IOException e) {
+					log.error("failed to copy file", e);
+				} finally {
+
+					try {
+						in.close();
+					} catch (IOException e) {
+						log.error("close pipe failed", e);
+					}
+
+					try {
+						if (out != null) {
+							out.close();
+						}
+					} catch (IOException e) {
+						log.error("close pipe failed", e);
+
+					}
 				}
 			}
+		}
+	}
+
+	@Override
+	protected ObjectType doGetType() throws FileException {
+
+		FileObject object = this.getObject();
+		try {
+
+			FileType fileType = object.getType();
+			switch (fileType) {
+				case FOLDER:
+
+					return ObjectType.DIRECTORY;
+				case FILE:
+
+					return ObjectType.FILE;
+
+				case FILE_OR_FOLDER:
+
+					break;
+				case IMAGINARY:
+				return ObjectType.IMAGE;
+
+				default:
+					break;
+			}
+
+			throw new  FileException("unknow file type");
+		} catch (FileSystemException e) {
+			throw new  FileException("get file type failed",e);
+
 		}
 	}
 

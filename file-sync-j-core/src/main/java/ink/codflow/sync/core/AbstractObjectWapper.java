@@ -3,6 +3,8 @@ package ink.codflow.sync.core;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import ink.codflow.sync.consts.ObjectType;
 import ink.codflow.sync.core.adapter.AdapterTypeEnum;
 import ink.codflow.sync.core.adapter.ObjectManipulationAdapter;
 import ink.codflow.sync.core.adapter.Vfs2OssObjectManiputationAdapter;
@@ -31,6 +33,9 @@ public abstract class AbstractObjectWapper<T> {
 	protected ClientEndpoint<T> endpoint;
 
 	protected Boolean directory;
+
+
+	ObjectType type;
 
 	long size = -1;
 
@@ -171,6 +176,10 @@ public abstract class AbstractObjectWapper<T> {
 		this.exist = exist;
 	}
 	
+
+	public ObjectType getType(){
+		return null;
+	}
 	
 	
 	@SuppressWarnings("unchecked")
@@ -212,4 +221,8 @@ public abstract class AbstractObjectWapper<T> {
 	public abstract void create() throws FileException;
 
 	public abstract void setTimeStamp(long timestamp) throws FileException ;
+
+	protected abstract ObjectType doGetType() throws FileException;
+
+
 }

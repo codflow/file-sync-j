@@ -87,8 +87,6 @@ public class OssObject {
 	}
 
 	
-	void lazyLoad() {
-		
-	}
+
 	
 }

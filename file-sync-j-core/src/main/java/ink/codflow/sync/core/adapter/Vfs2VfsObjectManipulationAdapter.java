@@ -93,7 +93,7 @@ public class Vfs2VfsObjectManipulationAdapter implements ObjectManipulationAdapt
 			// Locate the files to copy across
 			final ArrayList<FileObject> files = new ArrayList<>();
 			srcDir.findFiles(selector, false, files);
-
+			
 			// Copy everything across
 			for (final FileObject srcFile : files) {
 				// Determine the destination file

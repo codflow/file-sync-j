@@ -12,7 +12,7 @@ import com.aliyun.oss.model.PutObjectRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import ink.codflow.sync.consts.ObjectType;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.AbstractStreamObjectWapper;
 import ink.codflow.sync.core.ClientEndpoint;
@@ -95,19 +95,16 @@ public class OssObjectWapper extends AbstractStreamObjectWapper<OssObject> {
 	}
 
 	@Override
-	public AbstractObjectWapper<OssObject> createChild(String srcBaseName, boolean isDir) throws FileException {
+	public AbstractStreamObjectWapper<OssObject> createChild(String srcBaseName, boolean isDir) throws FileException {
 		OssObject object = new OssObject();
 		if (isDir) {
 			object.setSize(0);
 		}
-
 		OssObject obj0 = getObject();
 		String bucket0 = obj0.getBucketName();
 		String key0 = obj0.getKey();
 		object.setOss(obj0.getOss());
-
 		StringBuilder keySB = new StringBuilder(key0).append(srcBaseName);
-
 		if (isDir) {
 			keySB.append("/");
 		}
@@ -164,10 +161,9 @@ public class OssObjectWapper extends AbstractStreamObjectWapper<OssObject> {
 		}
 	}
 
-
 	@Override
 	public InputStream fileInputStream() throws FileException {
-		
+
 		OssObject object = this.getObject();
 		String bucketName = object.getBucketName();
 		String key = object.getKey();
@@ -177,20 +173,15 @@ public class OssObjectWapper extends AbstractStreamObjectWapper<OssObject> {
 		return in;
 	}
 
-
-
 	@Override
 	public void copyContentFrom(InputStream in) throws FileException {
 
-		//TODO add large file support
+		// TODO add large file support
 		OssObject object = this.getObject();
 		String bucketName = object.getBucketName();
 		String key = object.getKey();
 		OSS ossClient = object.getOss();
-		// ossClient.putObject(bucket, key, inputStream);
 		PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, in);
-		// ObjectMetadata metadata = new ObjectMetadata();
-		// putObjectRequest.setMetadata(metadata);
 		ossClient.putObject(putObjectRequest);
 	}
 
@@ -198,6 +189,12 @@ public class OssObjectWapper extends AbstractStreamObjectWapper<OssObject> {
 	public void setTimeStamp(long timestamp) throws FileException {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	protected ObjectType doGetType() throws FileException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -5,8 +5,7 @@ import java.util.Map;
 
 import ink.codflow.sync.consts.AuthDataType;
 import ink.codflow.sync.consts.AuthenticationType;
-import lombok.Builder;
-import lombok.Data;
+
 
 
 public class AuthenticationBO {
