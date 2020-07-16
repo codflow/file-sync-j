@@ -229,7 +229,7 @@ public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements W
         long destSize = destObject.getSize();
         long srcTS = srcObject.getLastMod();
         long destTs = destObject.getLastMod();
-        return srcSize != destSize || srcTS < destTs;
+        return srcSize != destSize || srcTS > destTs;
     }
 
 

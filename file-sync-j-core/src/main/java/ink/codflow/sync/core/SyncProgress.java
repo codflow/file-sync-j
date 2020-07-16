@@ -35,7 +35,6 @@ public class SyncProgress {
         this.analyseSize = new AtomicLong(analyseSize);
         this.syncedFileCount = new AtomicLong(syncedFileCount);
         this.analyseFileCount = new AtomicLong(analyseFileCount);
-        
         this.totalDestSize = new AtomicLong(totalDestSize);
 
         

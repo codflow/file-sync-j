@@ -206,6 +206,10 @@ public class LinkWorker {
 		}
 
 	}
+	public void forceUpdateStatus(SyncStatusEnum status){
+		this.progress.setStatus(status);
+	}
+
 
 	public SyncProgress getProgress() {
 		return progress;

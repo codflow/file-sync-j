@@ -72,7 +72,7 @@ public class OssClient implements Client<OssObject> {
 		
 		for (String ossDirObject : dirList) {
 			
-			String key = key0+ossDirObject;
+			String key = ossDirObject;
 			String bucket = bucketName;
 			OssObject ossObject = new OssObject();
 			ossObject.setBucketName(bucket);

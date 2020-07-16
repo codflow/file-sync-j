@@ -23,9 +23,6 @@ import ink.codflow.sync.thread.TaskStatus;
 
 public class SyncTask implements Runnable {
 
-
-    
-
     private static final Logger log = LoggerFactory.getLogger(SyncTask.class);
 
     private static final Map<FileSyncMode, WorkerHandler> handlerMap = new HashMap<FileSyncMode, WorkerHandler>();
@@ -108,6 +105,7 @@ public class SyncTask implements Runnable {
                 doRunATask(this);
             }
         } catch (Exception e) {
+            taskStatusListener.statusChange(getSyncProgressView(), SyncStatusEnum.FAILED);
             log.error("task error", e);
         }
     }
@@ -144,7 +142,7 @@ public class SyncTask implements Runnable {
 
                 AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
                 AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
-                
+
                 LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
                 linkWorker.setSpecs(specs);
                 FileSyncMode mode0 = task.getMode();
@@ -155,14 +153,16 @@ public class SyncTask implements Runnable {
             }
 
             for (LinkWorker linkWorker : task.workerList) {
-                
+
                 linkWorker.analyse();
             }
 
-
-
             if (taskStatusListener != null) {
                 if (!taskStatusListener.statusChange(getSyncProgressView(), getSyncProgressView().getStatus())) {
+                    for (LinkWorker linkWorker : task.workerList) {
+                        linkWorker.forceUpdateStatus(SyncStatusEnum.FAILED);
+                        ;
+                    }
                     throw new BackupInterruptException();
                 }
             }
@@ -178,8 +178,10 @@ public class SyncTask implements Runnable {
             }
 
         } catch (Exception e) {
-            taskStatusListener.statusChange(getSyncProgressView(), SyncStatusEnum.FAILED);
-            log.error("task error", e);
+            if (taskStatusListener != null) {
+                taskStatusListener.statusChange(getSyncProgressView(), SyncStatusEnum.FAILED);
+            }
+            log.error("task error0", e);
         }
 
     }
@@ -221,7 +223,6 @@ public class SyncTask implements Runnable {
             }
         }
 
-        
         SyncStatusEnum finalStatus = SyncStatusEnum.resolveOrigin(taskStatusOrgin);
 
         SyncProgress syncProgressView0 = new SyncProgress(syncedSize, analyseSize, syncedFileCount, analyseFileCount,
