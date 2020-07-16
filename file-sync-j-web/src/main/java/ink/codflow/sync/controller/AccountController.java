@@ -19,8 +19,6 @@ public class AccountController {
     @Autowired
     public AccountController(AccountService accountService){
 
-
-
     }
 
     RestApiResponse<AccountDTO> getAccount(AccountDTO accountDTO){
