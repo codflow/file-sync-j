@@ -42,7 +42,7 @@
 		</dependencies>
 	</dependencyManagement>
 	<dependencies></dependencies>
-
+<!-- 
 	<repositories>
 		<repository>
 			<id>maven-ali</id>
@@ -57,7 +57,7 @@
 				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
 		</repository>
-	</repositories>
+	</repositories> -->
 
 	<modules>
 		<module>file-sync-j-core</module>
