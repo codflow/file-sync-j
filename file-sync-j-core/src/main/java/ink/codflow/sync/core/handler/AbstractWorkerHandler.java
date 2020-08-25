@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.exception.FileException;
-import ink.codflow.sync.task.LinkWorker;
 import ink.codflow.sync.task.TaskSpecs;
 import ink.codflow.sync.task.LinkWorker.AnalyseListener;
 import ink.codflow.sync.task.LinkWorker.SyncListener;

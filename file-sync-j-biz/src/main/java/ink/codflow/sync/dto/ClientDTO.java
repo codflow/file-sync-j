@@ -1,8 +1,20 @@
 package ink.codflow.sync.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ClientDTO {
+
+    Integer id;
     
+    String accountId;
     
-     String id;
-     
+    String name;
+    
+    Long createTime;
+    
+    Long updateTime;
+
 }

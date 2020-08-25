@@ -7,11 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.aliyun.oss.model.Bucket;
-
-import ink.codflow.sync.bo.ClientEndpointBO;
-import ink.codflow.sync.bo.LinkBO;
-import ink.codflow.sync.bo.ObjectBO;
-import ink.codflow.sync.bo.TaskBO;
+ 
 import ink.codflow.sync.consts.AuthDataType;
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.core.AbstractObjectWapper;
@@ -34,7 +30,8 @@ public class FileSyncManager {
 		this.conductor = conductor;
 	}
 
-	public SyncTask createSyncTask(LinkBO link, List<ObjectBO> selectedObjects, FileSyncMode mode) throws FileException {
+	public SyncTask createSyncTask(LinkBO link, List<ObjectBO> selectedObjects, FileSyncMode mode)
+			throws FileException {
 
 		ClientEndpointBO distEndpointBO = link.getDestEndpoint();
 		ClientEndpointBO srcEndpointBO = link.getSrcEndpoint();
@@ -55,8 +52,7 @@ public class FileSyncManager {
 		return conductor.launch(task);
 	}
 
-	public boolean testClient(ClientEndpointBO endpoint){
-
+	public boolean testClient(ClientEndpointBO endpoint) {
 
 		try {
 			ClientEndpoint<?> clientEndpoint = conductor.getEndpoint(endpoint, true);
@@ -100,7 +96,7 @@ public class FileSyncManager {
 	public List<ObjectBO> listEndpointContent(ClientEndpointBO endpointBO, String uri) throws FileException {
 		ClientEndpoint<?> clientEndpoint = conductor.getEndpoint(endpointBO);
 		AbstractObjectWapper<?> rootWapper = clientEndpoint.resolve(uri);
-		if(rootWapper.isExist()){
+		if (rootWapper.isExist()) {
 			List<AbstractObjectWapper<?>> wappers = clientEndpoint.list(uri);
 			List<ObjectBO> objectBOList = new ArrayList<ObjectBO>();
 			for (AbstractObjectWapper<?> abstractObjectWapper : wappers) {
@@ -133,7 +129,8 @@ public class FileSyncManager {
 			List<Bucket> buckets = client0.getClient().listBuckets();
 			for (Bucket bucket : buckets) {
 				String exEndpoint = bucket.getExtranetEndpoint();
-				if (exEndpoint != null && exEndpoint.equals(clientEndpointBO.getAuthenticationBO().getParam(AuthDataType.HOST))) {
+				if (exEndpoint != null
+						&& exEndpoint.equals(clientEndpointBO.getAuthenticationBO().getParam(AuthDataType.HOST))) {
 					String bucketName = bucket.getName();
 					bucketNameList.add(bucketName);
 				}
@@ -147,7 +144,7 @@ public class FileSyncManager {
 
 	public boolean testClientWithBK(ClientEndpointBO clientEndpointBO) {
 		try {
-			listEndpointContent(clientEndpointBO,"/");
+			listEndpointContent(clientEndpointBO, "/");
 			return true;
 		} catch (Exception e) {
 			return false;

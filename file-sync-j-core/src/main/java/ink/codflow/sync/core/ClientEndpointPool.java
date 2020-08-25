@@ -3,8 +3,7 @@ package ink.codflow.sync.core;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import ink.codflow.sync.bo.AuthenticationBO;
-import ink.codflow.sync.bo.ClientEndpointBO;
+import ink.codflow.sync.manager.*;
 import ink.codflow.sync.consts.AuthDataType;
 import ink.codflow.sync.consts.AuthenticationType;
 import ink.codflow.sync.consts.ClientTypeEnum;

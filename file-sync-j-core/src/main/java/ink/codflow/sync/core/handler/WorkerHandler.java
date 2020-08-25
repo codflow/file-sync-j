@@ -1,7 +1,6 @@
 package ink.codflow.sync.core.handler;
 
 import ink.codflow.sync.core.AbstractObjectWapper;
-import ink.codflow.sync.task.LinkWorker;
 import ink.codflow.sync.task.TaskSpecs;
 import ink.codflow.sync.task.LinkWorker.AnalyseListener;
 import ink.codflow.sync.task.LinkWorker.SyncListener;

@@ -16,13 +16,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
+import ink.codflow.sync.manager.*;
 
-import com.aliyun.oss.model.LiveChannelStat.VideoStat;
-
-import ink.codflow.sync.bo.ClientEndpointBO;
-import ink.codflow.sync.bo.LinkBO;
-import ink.codflow.sync.bo.TaskBO;
-import ink.codflow.sync.bo.WorkerTaskBO;
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.exception.ArgumentsException;
 import ink.codflow.sync.exception.FileException;

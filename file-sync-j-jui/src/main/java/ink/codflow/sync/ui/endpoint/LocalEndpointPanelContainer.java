@@ -8,7 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import ink.codflow.sync.bo.ClientEndpointBO;
+import ink.codflow.sync.manager.*;
 import ink.codflow.sync.consts.ClientTypeEnum;
 
 public class LocalEndpointPanelContainer extends AbstractEndpointPanelContainer implements EndpointPanelContainer {
@@ -59,8 +59,12 @@ public class LocalEndpointPanelContainer extends AbstractEndpointPanelContainer 
 
 		String name = nameField.getText();
 		String path = pathField.getText();
-		return ClientEndpointBO.builder().id(generateEndpointId()).name(name).type(ClientTypeEnum.LOCAL).rootPath(path)
-				.build();
+
+		ClientEndpointBO clientEndpointBO =  new ClientEndpointBO();
+		clientEndpointBO.setName(name);
+		clientEndpointBO.setType(ClientTypeEnum.LOCAL);
+		clientEndpointBO.setRootPath(path);
+		return clientEndpointBO;
 	}
 
 	void addComponentToLayout(GridBagLayout gridBag, Component comp) {

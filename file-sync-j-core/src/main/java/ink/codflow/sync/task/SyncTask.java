@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ink.codflow.sync.bo.ObjectBO;
+import ink.codflow.sync.manager.*;
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.consts.SyncStatusEnum;
 import ink.codflow.sync.core.AbstractObjectWapper;
@@ -20,7 +18,6 @@ import ink.codflow.sync.core.handler.SyncFileWorkerHandler;
 import ink.codflow.sync.core.handler.WorkerHandler;
 import ink.codflow.sync.exception.BackupInterruptException;
 import ink.codflow.sync.exception.FileException;
-import ink.codflow.sync.thread.TaskStatus;
 
 
 public class SyncTask implements Runnable {

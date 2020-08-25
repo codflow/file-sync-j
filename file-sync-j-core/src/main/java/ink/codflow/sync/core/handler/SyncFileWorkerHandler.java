@@ -11,12 +11,11 @@ import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.exception.RemotingException;
-import ink.codflow.sync.task.LinkWorker;
 import ink.codflow.sync.task.TaskSpecs;
 import ink.codflow.sync.task.LinkWorker.AnalyseListener;
 import ink.codflow.sync.task.LinkWorker.SyncListener;
 
-public class SyncFileWorkerHandler extends AbstractWorkerHandler implements WorkerHandler {
+public class SyncFileWorkerHandler extends AbstractWorkerHandler  {
 
     private static final Logger log = LoggerFactory.getLogger(SyncFileWorkerHandler.class);
     public static final FileSyncMode SYNC_MODE = FileSyncMode.SYNC;

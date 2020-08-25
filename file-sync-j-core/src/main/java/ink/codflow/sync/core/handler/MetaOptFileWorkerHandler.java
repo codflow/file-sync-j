@@ -3,7 +3,6 @@ package ink.codflow.sync.core.handler;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,15 +10,13 @@ import org.slf4j.LoggerFactory;
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.consts.TaskSpecType;
 import ink.codflow.sync.core.AbstractObjectWapper;
-import ink.codflow.sync.exception.BackupInterruptException;
 import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.exception.RemotingException;
-import ink.codflow.sync.task.LinkWorker;
-import ink.codflow.sync.task.TaskSpecs;
 import ink.codflow.sync.task.LinkWorker.AnalyseListener;
 import ink.codflow.sync.task.LinkWorker.SyncListener;
+import ink.codflow.sync.task.TaskSpecs;
 
-public class MetaOptFileWorkerHandler extends AbstractWorkerHandler implements WorkerHandler {
+public class MetaOptFileWorkerHandler extends AbstractWorkerHandler  {
 
     private static final Logger log = LoggerFactory.getLogger(MetaOptFileWorkerHandler.class);
     public static final FileSyncMode SYNC_MODE0 = FileSyncMode.META_OPTIMIZED;

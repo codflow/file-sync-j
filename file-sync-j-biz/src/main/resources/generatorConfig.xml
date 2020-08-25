@@ -14,8 +14,8 @@
         </commentGenerator>
         <!-- !!!! Database Configurations !!!! -->
         <jdbcConnection connectionURL="${db.url}"
-			driverClass="${db.driverClassName}" password="${db.password}"
-			userId="${db.username}" />
+                     driverClass="${db.driverClassName}" password="${db.password}"
+                     userId="${db.username}" />
         <!-- <jdbcConnection driverClass="org.h2.Driver"
                         connectionURL="jdbc:h2:mem:mbgdemo;MODE=MYSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=FALSE"
                         userId="sa"
@@ -25,18 +25,18 @@
         </javaTypeResolver>
         <!-- !!!! Model Configurations !!!! -->
         <javaModelGenerator targetPackage="ink.codflow.sync.entity"
-                            targetProject="src/main/java">
+                            targetProject="file-sync-j-biz/src/main/java">
             <property name="enableSubPackages" value="false" />
             <property name="trimStrings" value="true" />
         </javaModelGenerator>
         <!-- !!!! Mapper XML Configurations !!!! -->
         <sqlMapGenerator targetPackage="mappers"
-                         targetProject="src/main/resources">
+                         targetProject="file-sync-j-biz/src/main/resources">
             <property name="enableSubPackages" value="false" />
         </sqlMapGenerator>
         <!-- !!!! Mapper Interface Configurations !!!! -->
         <javaClientGenerator targetPackage="ink.codflow.sync.dao"
-                             targetProject="src/main/java" type="XMLMAPPER">
+                             targetProject="file-sync-j-biz/src/main/java" type="XMLMAPPER">
             <property name="enableSubPackages" value="false" />
         </javaClientGenerator>
         <!-- !!!! Table Configurations !!!! -->

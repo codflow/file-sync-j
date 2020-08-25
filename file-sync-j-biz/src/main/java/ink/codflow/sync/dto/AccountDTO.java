@@ -1,5 +1,8 @@
 package ink.codflow.sync.dto;
 
+import lombok.Data;
+
+@Data
 public class AccountDTO {
 
     String id;
@@ -7,9 +10,13 @@ public class AccountDTO {
     String username;
 
     String password;
+    
+    String type;
 
     Long createTime;
     
     Long updateTime;
+    
+    
 
 }

@@ -20,8 +20,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
+import ink.codflow.sync.manager.*;
 
-import ink.codflow.sync.bo.ClientEndpointBO;
 import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.manager.FileSyncManager;
 import ink.codflow.sync.ui.MainInterface.PanelActionListener;

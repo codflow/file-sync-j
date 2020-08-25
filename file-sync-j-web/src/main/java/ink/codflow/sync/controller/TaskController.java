@@ -6,19 +6,25 @@ import ink.codflow.sync.dto.TaskDTO;
 public class TaskController {
     
 
-    RestApiResponse<TaskDTO> getAccount(TaskDTO taskDTO){
+    RestApiResponse<TaskDTO> getTask(TaskDTO taskDTO){
         return null;
     }
 
-    RestApiResponse<?> createAccount(TaskDTO taskDTO){
+    RestApiResponse<?> createTask(TaskDTO taskDTO){
         return null;
     }
-    RestApiResponse<?> updateAccount(TaskDTO taskDTO){
+    RestApiResponse<?> updateTask(TaskDTO taskDTO){
         return null;
     }
 
-    RestApiResponse<?> deleteAccount(TaskDTO taskDTO){
+    RestApiResponse<?> deleteTask(TaskDTO taskDTO){
         return null;
     }
+
+    RestApiResponse<?> getTaskDetail(TaskDTO taskDTO){
+        return null;
+    }
+
+
 
 }

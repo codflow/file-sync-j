@@ -13,7 +13,11 @@
 			<artifactId>file-sync-j-core</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-
+		<dependency>
+			<groupId>ink.codflow.sync</groupId>
+			<artifactId>file-sync-j-biz</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -59,7 +63,7 @@
 					<mainClass>ink.codflow.Application</mainClass>
 				</configuration>
 			</plugin>
-            <plugin>
+            <!-- <plugin>
                 <groupId>org.mybatis.generator</groupId>
                 <artifactId>mybatis-generator-maven-plugin</artifactId>
                 <dependencies>
@@ -86,7 +90,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin> -->
 
 		</plugins>
 

@@ -6,18 +6,18 @@ import ink.codflow.sync.dto.LinkDTO;
 public class LinkController {
 
 
-    RestApiResponse<LinkDTO> getAccount(LinkDTO linkDTO){
+    RestApiResponse<LinkDTO> getLinkById(String id){
         return null;
     }
 
-    RestApiResponse<?> createAccount(LinkDTO linkDTO){
+    RestApiResponse<?> createLink(LinkDTO linkDTO){
         return null;
     }
-    RestApiResponse<?> updateAccount(LinkDTO linkDTO){
+    RestApiResponse<?> updateLink(LinkDTO linkDTO){
         return null;
     }
 
-    RestApiResponse<?> deleteAccount(LinkDTO linkDTO){
+    RestApiResponse<?> deleteLink(String id){
         return null;
     }
 

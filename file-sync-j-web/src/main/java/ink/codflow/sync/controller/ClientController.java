@@ -7,18 +7,18 @@ public class ClientController {
 
 
     
-    RestApiResponse<ClientDTO> getAccount(ClientDTO clientDTO){
+    RestApiResponse<ClientDTO> getClient(ClientDTO clientDTO){
         return null;
     }
 
-    RestApiResponse<?> createAccount(ClientDTO clientDTO){
+    RestApiResponse<?> createClient(ClientDTO clientDTO){
         return null;
     }
-    RestApiResponse<?> updateAccount(ClientDTO clientDTO){
+    RestApiResponse<?> updateClient(ClientDTO clientDTO){
         return null;
     }
 
-    RestApiResponse<?> deleteAccount(ClientDTO clientDTO){
+    RestApiResponse<?> deleteClient(ClientDTO clientDTO){
         return null;
     }
 

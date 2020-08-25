@@ -21,18 +21,22 @@ public class AccountController {
 
     }
 
-    RestApiResponse<AccountDTO> getAccount(AccountDTO accountDTO){
-        return null;
+    RestApiResponse<AccountDTO> getAccount(String id){
+        AccountDTO result = accountService.getById(id);
+        return RestApiResponse.successResponse(result);
     }
 
     RestApiResponse<?> createAccount(AccountDTO accountDTO){
+        int result = accountService.create(accountDTO);
         return null;
     }
     RestApiResponse<?> updateAccount(AccountDTO accountDTO){
+        int result = accountService.update(accountDTO);
         return null;
     }
 
-    RestApiResponse<?> deleteAccount(AccountDTO accountDTO){
+    RestApiResponse<?> deleteAccount(String id){
+        int result = accountService.delete(id);
         return null;
     }
     

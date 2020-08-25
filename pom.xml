@@ -13,6 +13,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+		<h2.version>1.4.197</h2.version>
 	</properties>
 
 	<dependencyManagement>
@@ -63,5 +64,6 @@
 		<module>file-sync-j-core</module>
 		<module>file-sync-j-jui</module>
 		<module>file-sync-j-web</module>
+		<module>file-sync-j-biz</module>
 	</modules>
 </project>

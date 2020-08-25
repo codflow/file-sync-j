@@ -6,11 +6,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import ink.codflow.sync.bo.ClientEndpointBO;
-import ink.codflow.sync.bo.LinkBO;
-import ink.codflow.sync.bo.ObjectBO;
-import ink.codflow.sync.bo.TaskBO;
-import ink.codflow.sync.bo.WorkerTaskBO;
+import ink.codflow.sync.manager.*;
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.consts.SyncStatusEnum;
 import ink.codflow.sync.core.ClientEndpoint;
