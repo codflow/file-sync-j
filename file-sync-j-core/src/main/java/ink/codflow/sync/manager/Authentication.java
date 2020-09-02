@@ -8,7 +8,7 @@ import ink.codflow.sync.consts.AuthenticationType;
 
 
 
-public class AuthenticationBO {
+public class Authentication {
 
     String id;
     

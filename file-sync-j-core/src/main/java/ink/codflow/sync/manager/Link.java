@@ -2,12 +2,12 @@ package ink.codflow.sync.manager;
 
 import ink.codflow.sync.consts.FileSyncMode;
 
-public class LinkBO {
+public class Link {
     
     int id;
     
-    ClientEndpointBO srcEndpoint;
-    ClientEndpointBO destEndpoint;
+    Endpoint srcEndpoint;
+    Endpoint destEndpoint;
     
     long expire;
     
@@ -32,28 +32,28 @@ public class LinkBO {
     /**
      * @return the srcEndpoint
      */
-    public ClientEndpointBO getSrcEndpoint() {
+    public Endpoint getSrcEndpoint() {
         return srcEndpoint;
     }
 
     /**
      * @param srcEndpoint the srcEndpoint to set
      */
-    public void setSrcEndpoint(ClientEndpointBO srcEndpoint) {
+    public void setSrcEndpoint(Endpoint srcEndpoint) {
         this.srcEndpoint = srcEndpoint;
     }
 
     /**
      * @return the destEndpoint
      */
-    public ClientEndpointBO getDestEndpoint() {
+    public Endpoint getDestEndpoint() {
         return destEndpoint;
     }
 
     /**
      * @param destEndpoint the destEndpoint to set
      */
-    public void setDestEndpoint(ClientEndpointBO destEndpoint) {
+    public void setDestEndpoint(Endpoint destEndpoint) {
         this.destEndpoint = destEndpoint;
     }
 

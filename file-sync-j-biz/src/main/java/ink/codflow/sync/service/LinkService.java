@@ -15,7 +15,6 @@ public class LinkService {
     }
 
     int delete(String id,Boolean clearEndpoint){
-
         return 0;
     }
 

@@ -5,28 +5,28 @@ import java.util.List;
 
 
 
-public class TaskBO {
+public class Task {
 
     
-    List<WorkerTaskBO> workerTasklist = new ArrayList<WorkerTaskBO>();
+    List<WorkerTask> workerTasklist = new ArrayList<WorkerTask>();
     
     
     
-    public  void addWorkerTask(final WorkerTaskBO workerTaskBO) {
+    public  void addWorkerTask(final WorkerTask workerTaskBO) {
         workerTasklist.add(workerTaskBO);
     }
 
     /**
      * @return the workerTasklist
      */
-    public List<WorkerTaskBO> getWorkerTasklist() {
+    public List<WorkerTask> getWorkerTasklist() {
         return workerTasklist;
     }
 
     /**
      * @param workerTasklist the workerTasklist to set
      */
-    public void setWorkerTasklist(final List<WorkerTaskBO> workerTasklist) {
+    public void setWorkerTasklist(final List<WorkerTask> workerTasklist) {
         this.workerTasklist = workerTasklist;
     }
     

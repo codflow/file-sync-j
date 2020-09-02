@@ -3,7 +3,7 @@ package ink.codflow.sync.manager;
 import ink.codflow.sync.consts.SyncStatusEnum;
 import ink.codflow.sync.consts.TaskType;
 
-public class TaskStatusBO {
+public class TaskStatus {
 
 
     String id;

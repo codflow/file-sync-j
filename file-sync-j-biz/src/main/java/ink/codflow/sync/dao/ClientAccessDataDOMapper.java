@@ -1,5 +1,7 @@
 package ink.codflow.sync.dao;
 
+import java.util.List;
+
 import ink.codflow.sync.entity.ClientAccessDataDO;
 
 public interface ClientAccessDataDOMapper {
@@ -39,4 +41,11 @@ public interface ClientAccessDataDOMapper {
      * @mbg.generated
      */
     int updateByPrimaryKey(ClientAccessDataDO record);
+
+    /**
+     * @description: TODO
+     * @param clientAccessId
+     * @return List<ClientAccessDataDO>
+     */
+    List<ClientAccessDataDO> selectByClientAccessId(Integer clientAccessId);
 }

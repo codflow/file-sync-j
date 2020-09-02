@@ -55,12 +55,12 @@ public class LocalEndpointPanelContainer extends AbstractEndpointPanelContainer 
 		return false;
 	}
 
-	public ClientEndpointBO getEndpointBO() {
+	public Endpoint getEndpointBO() {
 
 		String name = nameField.getText();
 		String path = pathField.getText();
 
-		ClientEndpointBO clientEndpointBO =  new ClientEndpointBO();
+		Endpoint clientEndpointBO =  new Endpoint();
 		clientEndpointBO.setName(name);
 		clientEndpointBO.setType(ClientTypeEnum.LOCAL);
 		clientEndpointBO.setRootPath(path);

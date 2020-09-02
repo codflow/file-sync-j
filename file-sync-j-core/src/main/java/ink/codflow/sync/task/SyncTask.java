@@ -45,7 +45,7 @@ public class SyncTask implements Runnable {
 
     FileSyncMode mode;
 
-    List<ObjectBO> selectedObjects;
+    List<FileObject> selectedObjects;
 
     String id;
 
@@ -125,7 +125,7 @@ public class SyncTask implements Runnable {
 
 
     void doPrepareATask(SyncTask task) throws FileException {
-            List<ObjectBO> objectUriBOs = task.selectedObjects;
+            List<FileObject> objectUriBOs = task.selectedObjects;
             if (objectUriBOs != null && !objectUriBOs.isEmpty()) {
                 ArrayList<SimpleObject> simpleObjects = new ArrayList<SimpleObject>();
 
@@ -134,7 +134,7 @@ public class SyncTask implements Runnable {
                 AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
                 SelectedLinkWorker linkWorker = new SelectedLinkWorker(srcObject, destObject, simpleObjects);
                 linkWorker.setSpecs(specs);
-                for (ObjectBO objectBO : objectUriBOs) {
+                for (FileObject objectBO : objectUriBOs) {
 
                     String uri = objectBO.getUri();
                     boolean file = objectBO.getFile();
@@ -209,7 +209,7 @@ public class SyncTask implements Runnable {
 
         try {
 
-            List<ObjectBO> objectUriBOs = task.selectedObjects;
+            List<FileObject> objectUriBOs = task.selectedObjects;
             if (objectUriBOs != null && !objectUriBOs.isEmpty()) {
                 ArrayList<SimpleObject> simpleObjects = new ArrayList<SimpleObject>();
 
@@ -218,7 +218,7 @@ public class SyncTask implements Runnable {
                 AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
                 SelectedLinkWorker linkWorker = new SelectedLinkWorker(srcObject, destObject, simpleObjects);
                 linkWorker.setSpecs(specs);
-                for (ObjectBO objectBO : objectUriBOs) {
+                for (FileObject objectBO : objectUriBOs) {
 
                     String uri = objectBO.getUri();
                     boolean file = objectBO.getFile();
@@ -379,11 +379,11 @@ public class SyncTask implements Runnable {
         this.mode = mode;
     }
 
-    public List<ObjectBO> getSelectedObjects() {
+    public List<FileObject> getSelectedObjects() {
         return selectedObjects;
     }
 
-    public void setSelectedObjects(List<ObjectBO> selectedObjects) {
+    public void setSelectedObjects(List<FileObject> selectedObjects) {
         this.selectedObjects = selectedObjects;
     }
 

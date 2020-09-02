@@ -2,7 +2,7 @@ package ink.codflow.sync.manager;
 
 
  
-public class ObjectBO {
+public class FileObject {
     
     int linkId;
     

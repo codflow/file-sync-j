@@ -56,7 +56,7 @@ public class EndpointEditor {
 
 	FileSyncManager fileSyncManager;
 
-	ClientEndpointBO verfiedEndpointBO;
+	Endpoint verfiedEndpointBO;
 
 	public static void main(String[] args) {
 
@@ -156,7 +156,7 @@ public class EndpointEditor {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ClientEndpointBO clientEndpointBO = getVerfiedEndpointBO();
+				Endpoint clientEndpointBO = getVerfiedEndpointBO();
 
 				if (clientEndpointBO != null) {
 					String name = clientEndpointBO.getName();
@@ -173,7 +173,7 @@ public class EndpointEditor {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ClientEndpointBO clientEndpointBO = currentContainer.getEndpointBO();
+				Endpoint clientEndpointBO = currentContainer.getEndpointBO();
 				String name = clientEndpointBO.getName();
 				if (name != null) {
 					cActionListener.delete(name);
@@ -256,7 +256,7 @@ public class EndpointEditor {
 
 	public boolean testEndpoint() {
 
-		ClientEndpointBO clientEndpointBO = this.currentContainer.getEndpointBO();
+		Endpoint clientEndpointBO = this.currentContainer.getEndpointBO();
 
 
 			if (fileSyncManager.testClient(clientEndpointBO)) {
@@ -274,7 +274,7 @@ public class EndpointEditor {
 		this.fileSyncManager = fileSyncManager;
 	}
 
-	public ClientEndpointBO getVerfiedEndpointBO() {
+	public Endpoint getVerfiedEndpointBO() {
 		return verfiedEndpointBO;
 	}
 

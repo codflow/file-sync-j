@@ -6,31 +6,31 @@ import java.util.List;
 import ink.codflow.sync.task.TaskSpecs;
 
 
-public class WorkerTaskBO {
+public class WorkerTask {
 
-    LinkBO linkBO;
+    Link linkBO;
     
     TaskSpecs specs;
     
-    List<ObjectBO> objectList = new ArrayList<ObjectBO>();
+    List<FileObject> objectList = new ArrayList<FileObject>();
     
-    public void addObjectUri(ObjectBO e) {
+    public void addObjectUri(FileObject e) {
         objectList.add(e);
     }
 
-    public LinkBO getLinkBO() {
+    public Link getLinkBO() {
         return linkBO;
     }
 
-    public void setLinkBO(LinkBO linkBO) {
+    public void setLinkBO(Link linkBO) {
         this.linkBO = linkBO;
     }
 
-    public List<ObjectBO> getObjectList() {
+    public List<FileObject> getObjectList() {
         return objectList;
     }
 
-    public void setObjectList(List<ObjectBO> objectList) {
+    public void setObjectList(List<FileObject> objectList) {
         this.objectList = objectList;
     }
 

@@ -28,7 +28,7 @@ public class MainInterface {
 
 	FileSyncManager fileSyncManager;
 
-	Map<String, ClientEndpointBO> map = new HashMap<String, ClientEndpointBO>();
+	Map<String, Endpoint> map = new HashMap<String, Endpoint>();
 
 	Map<String, FileSyncMode> modeMap = new HashMap<String, FileSyncMode>();
 	JFrame jf;
@@ -119,7 +119,7 @@ public class MainInterface {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				TaskBO taskBO = createTaskBO();
+				Task taskBO = createTaskBO();
 				if (taskBO != null) {
 
 					if (fileSyncManager.getCurrentActiveTaskNumber() < 1) {
@@ -180,9 +180,9 @@ public class MainInterface {
 
 	class PanelActionListener {
 
-		Map<String, ClientEndpointBO> map;
+		Map<String, Endpoint> map;
 
-		public PanelActionListener(Map<String, ClientEndpointBO> map) {
+		public PanelActionListener(Map<String, Endpoint> map) {
 
 			this.map = map;
 		}
@@ -193,7 +193,7 @@ public class MainInterface {
 			afterAction();
 		}
 
-		void addOrUpdate(String key, ClientEndpointBO endpointBO) {
+		void addOrUpdate(String key, Endpoint endpointBO) {
 			this.map.put(key, endpointBO);
 			afterAction();
 		}
@@ -239,24 +239,24 @@ public class MainInterface {
 
 	}
 
-	ClientEndpointBO getSelectedSrcEndpoint() {
+	Endpoint getSelectedSrcEndpoint() {
 
 		Object name = this.srcComboBox.getSelectedItem();
 		return this.map.get(name);
 	}
 
-	ClientEndpointBO getSelectedDestEndpoint() {
+	Endpoint getSelectedDestEndpoint() {
 
 		Object name = this.destComboBox.getSelectedItem();
 		return this.map.get(name);
 	}
 
-	LinkBO getSelectLinkBO() {
-		ClientEndpointBO srcClientEndpointBO = getSelectedSrcEndpoint();
-		ClientEndpointBO destClientEndpointBO = getSelectedDestEndpoint();
+	Link getSelectLinkBO() {
+		Endpoint srcClientEndpointBO = getSelectedSrcEndpoint();
+		Endpoint destClientEndpointBO = getSelectedDestEndpoint();
 
 		if (srcClientEndpointBO != null && destClientEndpointBO != null) {
-			LinkBO linkBO = new LinkBO();
+			Link linkBO = new Link();
 			linkBO.setSrcEndpoint(srcClientEndpointBO);
 			linkBO.setDestEndpoint(destClientEndpointBO);
 			linkBO.setId(0);
@@ -266,14 +266,14 @@ public class MainInterface {
 		throw new ArgumentsException("Endpoint are not selected");
 	}
 
-	TaskBO createTaskBO() {
+	Task createTaskBO() {
 
-		LinkBO linkBO = getSelectLinkBO();
+		Link linkBO = getSelectLinkBO();
 		FileSyncMode mode = getSelectedMode();
 		linkBO.setMode(mode);
-		WorkerTaskBO workertaskBO = new WorkerTaskBO();
+		WorkerTask workertaskBO = new WorkerTask();
 		workertaskBO.setLinkBO(linkBO);
-		TaskBO taskBO = new TaskBO();
+		Task taskBO = new Task();
 		taskBO.addWorkerTask(workertaskBO);
 		return taskBO;
 	}

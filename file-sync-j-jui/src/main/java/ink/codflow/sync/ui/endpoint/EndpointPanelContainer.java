@@ -10,5 +10,5 @@ public interface EndpointPanelContainer {
 
 	JPanel panel();
 
-	ClientEndpointBO getEndpointBO();
+	Endpoint getEndpointBO();
 }

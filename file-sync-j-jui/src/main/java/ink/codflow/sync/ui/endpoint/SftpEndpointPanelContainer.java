@@ -97,7 +97,7 @@ public class SftpEndpointPanelContainer extends AbstractEndpointPanelContainer i
     }
 
     @Override
-    public ClientEndpointBO getEndpointBO() {
+    public Endpoint getEndpointBO() {
 
         String name = nameField.getText();
         String user = userField.getText();
@@ -110,16 +110,16 @@ public class SftpEndpointPanelContainer extends AbstractEndpointPanelContainer i
 
         String path = pathField.getText();
 
-        AuthenticationBO authenticationBO = new AuthenticationBO();
+        Authentication authenticationBO = new Authentication();
         authenticationBO.setAuthType(AuthenticationType.PASSWORD);
         authenticationBO.addParam(AuthDataType.HOST, host);
         authenticationBO.addParam(AuthDataType.USERNAME, user);
         authenticationBO.addParam(AuthDataType.PASSWD, password);
         authenticationBO.addParam(AuthDataType.ID, IdGen.genUUID());
-        ClientEndpointBO clientEndpointBO = new ClientEndpointBO();
+        Endpoint clientEndpointBO = new Endpoint();
         clientEndpointBO.setName(name);
         clientEndpointBO.setType(ClientTypeEnum.SFTP);
-        clientEndpointBO.setAuthenticationBO(authenticationBO);
+        clientEndpointBO.setAuthentication(authenticationBO);
         clientEndpointBO.setRootPath(path);
         return clientEndpointBO;
     }

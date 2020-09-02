@@ -24,7 +24,7 @@ public class ClientEndpointPool {
 
 	}
 
-	public ClientEndpoint<?> create(ClientEndpointBO endpointBO) throws FileException {
+	public ClientEndpoint<?> create(Endpoint endpointBO) throws FileException {
 
 		ClientEndpoint<?> clientEndpoint = new ClientEndpoint<>();
 		int id = endpointBO.getId();
@@ -39,7 +39,7 @@ public class ClientEndpointPool {
 
 	}
 
-	Client<?> doCreateClient(ClientEndpointBO endpointBO) throws FileException {
+	Client<?> doCreateClient(Endpoint endpointBO) throws FileException {
 		ClientTypeEnum type = endpointBO.getType();
 
 		switch (type) {
@@ -47,11 +47,11 @@ public class ClientEndpointPool {
 			return createLocalClient();
 
 		case SFTP:
-			AuthenticationBO sftpAuth = endpointBO.getAuthenticationBO();
+			Authentication sftpAuth = endpointBO.getAuthentication();
 			return createSftpClient(sftpAuth);
 		case OSS:
 
-			AuthenticationBO ossAuth = endpointBO.getAuthenticationBO();
+			Authentication ossAuth = endpointBO.getAuthentication();
 			return createOssClient(ossAuth);
 
 		default:
@@ -61,7 +61,7 @@ public class ClientEndpointPool {
 		return null;
 	}
 
-	private Client<?> createOssClient(AuthenticationBO ossAuth) {
+	private Client<?> createOssClient(Authentication ossAuth) {
 		
 		String endpoint = ossAuth.getParam(AuthDataType.HOST);
 		String ak = ossAuth.getParam(AuthDataType.AK);
@@ -81,7 +81,7 @@ public class ClientEndpointPool {
 		return cLocalVfsClient;
 	}
 
-	SftpVfsClient createSftpClient(AuthenticationBO auth) throws FileException {
+	SftpVfsClient createSftpClient(Authentication auth) throws FileException {
 
 		AuthenticationType authType = auth.getAuthType();
 		String host = auth.getParam(AuthDataType.HOST);

@@ -33,11 +33,10 @@ public class ClientService {
         String accountId = clientDTO.getAccountId();
         AccountDO accountDO = accountManager.getById(accountId);
         if (accountDO != null) {
-            String name = clientDTO.getName();
             
+            String name = clientDTO.getName();
             ClientDO clientDO = new ClientDO();
             clientDO.setName(name);
-            
             clientManager.create(clientDO);
         }
 

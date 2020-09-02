@@ -25,17 +25,17 @@ public class SyncTaskConductor {
 
     ClientEndpointPool clientPool = new ClientEndpointPool();
 
-    public Integer registerEndpoint(ClientEndpointBO endpointBO) throws FileException {
+    public Integer registerEndpoint(Endpoint endpointBO) throws FileException {
 
         ClientEndpoint<?> endPoint = clientPool.create(endpointBO);
         return endPoint.getId();
     }
 
-    public ClientEndpoint<?> getEndpoint(ClientEndpointBO endpointBO) throws FileException {
+    public ClientEndpoint<?> getEndpoint(Endpoint endpointBO) throws FileException {
         return getEndpoint(endpointBO, false);
     }
 
-    public ClientEndpoint<?> getEndpoint(ClientEndpointBO endpointBO, boolean renew) throws FileException {
+    public ClientEndpoint<?> getEndpoint(Endpoint endpointBO, boolean renew) throws FileException {
         int clientId = endpointBO.getId();
 
         ClientEndpoint<?> endPoint = clientPool.getEndpoint(clientId);
@@ -45,7 +45,7 @@ public class SyncTaskConductor {
         return endPoint;
     }
 
-    public SyncTask createSyncTask(LinkBO link, List<ObjectBO> selectedObjects, FileSyncMode mode) throws FileException {
+    public SyncTask createSyncTask(Link link, List<FileObject> selectedObjects, FileSyncMode mode) throws FileException {
 
         FileSyncMode mode0 = mode != null ? mode : link.getMode();
         return createTask(link, selectedObjects, mode0);
@@ -60,7 +60,7 @@ public class SyncTaskConductor {
         return traceId;
     }
 
-    public SyncTask createTask(Integer srcEndpointId, Integer dstEndpointId, List<ObjectBO> selectedObjects,
+    public SyncTask createTask(Integer srcEndpointId, Integer dstEndpointId, List<FileObject> selectedObjects,
             FileSyncMode mode) {
         ClientEndpoint<?> srcEndpoint = clientPool.getEndpoint(srcEndpointId);
         ClientEndpoint<?> dstEndpoint = clientPool.getEndpoint(dstEndpointId);
@@ -69,7 +69,7 @@ public class SyncTaskConductor {
     }
 
     protected SyncTask createTask(ClientEndpoint<?> srcEndpoint, ClientEndpoint<?> dstEndpoint,
-            List<ObjectBO> selectedObjects, FileSyncMode mode) {
+            List<FileObject> selectedObjects, FileSyncMode mode) {
 
         SyncTask syncTask = new SyncTask();
         syncTask.setId(IdGen.genUUID());
@@ -80,10 +80,10 @@ public class SyncTaskConductor {
         return syncTask;
     }
 
-    public SyncTask createTask(LinkBO linkBO, List<ObjectBO> objectList, FileSyncMode mode) throws FileException {
+    public SyncTask createTask(Link linkBO, List<FileObject> objectList, FileSyncMode mode) throws FileException {
 
-        ClientEndpointBO destEndpointBO = linkBO.getDestEndpoint();
-        ClientEndpointBO srcEndpointBO = linkBO.getSrcEndpoint();
+        Endpoint destEndpointBO = linkBO.getDestEndpoint();
+        Endpoint srcEndpointBO = linkBO.getSrcEndpoint();
         int srcEndpointId = srcEndpointBO.getId();
         int dstEndpointId = destEndpointBO.getId();
         ClientEndpoint<?> srcEndpoint0 = clientPool.getEndpoint(srcEndpointId);
@@ -102,16 +102,16 @@ public class SyncTaskConductor {
 
     }
 
-    public SyncTask createSyncTask(TaskBO taskBO) throws FileException {
+    public SyncTask createSyncTask(Task taskBO) throws FileException {
 
         SyncTask task = new SyncTask();
         task.setId(IdGen.genUUID());
-        List<WorkerTaskBO> workerTasklist = taskBO.getWorkerTasklist();
-        for (WorkerTaskBO workerTaskBO : workerTasklist) {
-            List<ObjectBO> objectUriList = workerTaskBO.getObjectList();
-            LinkBO linkBO = workerTaskBO.getLinkBO();
-            ClientEndpointBO distEndpointBO = linkBO.getDestEndpoint();
-            ClientEndpointBO srcEndpointBO = linkBO.getSrcEndpoint();
+        List<WorkerTask> workerTasklist = taskBO.getWorkerTasklist();
+        for (WorkerTask workerTaskBO : workerTasklist) {
+            List<FileObject> objectUriList = workerTaskBO.getObjectList();
+            Link linkBO = workerTaskBO.getLinkBO();
+            Endpoint distEndpointBO = linkBO.getDestEndpoint();
+            Endpoint srcEndpointBO = linkBO.getSrcEndpoint();
             if (distEndpointBO.getId() == srcEndpointBO.getId()) {
 				
 			}

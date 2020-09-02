@@ -12,7 +12,6 @@ import ink.codflow.sync.consts.AuthDataType;
 import ink.codflow.sync.consts.FileSyncMode;
 import ink.codflow.sync.core.AbstractObjectWapper;
 import ink.codflow.sync.core.ClientEndpoint;
-import ink.codflow.sync.exception.ArgumentsException;
 import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.task.SyncTask;
 import ink.codflow.sync.task.SyncTaskConductor;
@@ -30,11 +29,11 @@ public class FileSyncManager {
 		this.conductor = conductor;
 	}
 
-	public SyncTask createSyncTask(LinkBO link, List<ObjectBO> selectedObjects, FileSyncMode mode)
+	public SyncTask createSyncTask(Link link, List<FileObject> selectedObjects, FileSyncMode mode)
 			throws FileException {
 
-		ClientEndpointBO distEndpointBO = link.getDestEndpoint();
-		ClientEndpointBO srcEndpointBO = link.getSrcEndpoint();
+		Endpoint distEndpointBO = link.getDestEndpoint();
+		Endpoint srcEndpointBO = link.getSrcEndpoint();
 
 		FileSyncMode mode0 = mode != null ? mode : link.getMode();
 		conductor.registerEndpoint(srcEndpointBO);
@@ -43,7 +42,7 @@ public class FileSyncManager {
 		return task;
 	}
 
-	public SyncTask createSyncTask(TaskBO taskBO) throws FileException {
+	public SyncTask createSyncTask(Task taskBO) throws FileException {
 
 		return conductor.createSyncTask(taskBO);
 	}
@@ -52,7 +51,7 @@ public class FileSyncManager {
 		return conductor.launch(task);
 	}
 
-	public boolean testClient(ClientEndpointBO endpoint) {
+	public boolean testClient(Endpoint endpoint) {
 
 		try {
 			ClientEndpoint<?> clientEndpoint = conductor.getEndpoint(endpoint, true);
@@ -71,7 +70,7 @@ public class FileSyncManager {
 		}
 	}
 
-	public boolean deleteClient(ClientEndpointBO clientEndpointBO) throws FileException {
+	public boolean deleteClient(Endpoint clientEndpointBO) throws FileException {
 		clientEndpointBO.getRootPath();
 		ClientEndpoint<?> endpoint = conductor.getEndpoint(clientEndpointBO, true);
 		try {
@@ -93,17 +92,17 @@ public class FileSyncManager {
 		return conductor.countTaskInProgress();
 	}
 
-	public List<ObjectBO> listEndpointContent(ClientEndpointBO endpointBO, String uri) throws FileException {
+	public List<FileObject> listEndpointContent(Endpoint endpointBO, String uri) throws FileException {
 		ClientEndpoint<?> clientEndpoint = conductor.getEndpoint(endpointBO);
 		AbstractObjectWapper<?> rootWapper = clientEndpoint.resolve(uri);
 		if (rootWapper.isExist()) {
 			List<AbstractObjectWapper<?>> wappers = clientEndpoint.list(uri);
-			List<ObjectBO> objectBOList = new ArrayList<ObjectBO>();
+			List<FileObject> objectBOList = new ArrayList<FileObject>();
 			for (AbstractObjectWapper<?> abstractObjectWapper : wappers) {
 				String fileName = abstractObjectWapper.getBaseFileName();
 				String uri0 = abstractObjectWapper.getUri();
 				boolean file = abstractObjectWapper.isFile();
-				ObjectBO objectBO = new ObjectBO();
+				FileObject objectBO = new FileObject();
 				objectBO.setName(fileName);
 				objectBO.setFile(file);
 				if (file) {
@@ -118,7 +117,7 @@ public class FileSyncManager {
 		return new ArrayList<>();
 	}
 
-	public List<String> listBucket(ClientEndpointBO clientEndpointBO) throws FileException {
+	public List<String> listBucket(Endpoint clientEndpointBO) throws FileException {
 		ClientEndpoint<?> endpoint = conductor.getEndpoint(clientEndpointBO, true);
 		Client<?> client = endpoint.getRandomClient();
 
@@ -130,7 +129,7 @@ public class FileSyncManager {
 			for (Bucket bucket : buckets) {
 				String exEndpoint = bucket.getExtranetEndpoint();
 				if (exEndpoint != null
-						&& exEndpoint.equals(clientEndpointBO.getAuthenticationBO().getParam(AuthDataType.HOST))) {
+						&& exEndpoint.equals(clientEndpointBO.getAuthentication().getParam(AuthDataType.HOST))) {
 					String bucketName = bucket.getName();
 					bucketNameList.add(bucketName);
 				}
@@ -142,7 +141,7 @@ public class FileSyncManager {
 		throw new FileException("Wrong oss client arguments!");
 	}
 
-	public boolean testClientWithBK(ClientEndpointBO clientEndpointBO) {
+	public boolean testClientWithBK(Endpoint clientEndpointBO) {
 		try {
 			listEndpointContent(clientEndpointBO, "/");
 			return true;

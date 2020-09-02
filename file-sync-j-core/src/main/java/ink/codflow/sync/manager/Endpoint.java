@@ -2,13 +2,13 @@ package ink.codflow.sync.manager;
 
 import ink.codflow.sync.consts.ClientTypeEnum;
 
-public class ClientEndpointBO {
+public class Endpoint {
 
     int id;
     String name;
     String authId;
     
-    AuthenticationBO authenticationBO;
+    Authentication authenticationBO;
     
     ClientTypeEnum type; 
     String rootPath;
@@ -58,14 +58,14 @@ public class ClientEndpointBO {
     /**
      * @return the authenticationBO
      */
-    public AuthenticationBO getAuthenticationBO() {
+    public Authentication getAuthentication() {
         return authenticationBO;
     }
 
     /**
      * @param authenticationBO the authenticationBO to set
      */
-    public void setAuthenticationBO(AuthenticationBO authenticationBO) {
+    public void setAuthentication(Authentication authenticationBO) {
         this.authenticationBO = authenticationBO;
     }
 
