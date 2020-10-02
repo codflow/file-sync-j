@@ -24,7 +24,7 @@ public class ClientAccessManager {
     ClientAccessDataDOMapper clientAccessDataDOMapper;
     
     
-    ClientAccessBO  getClientAccessById(Integer clientAccessId){
+    public ClientAccessBO  getClientAccessById(Integer clientAccessId){
         
         ClientAccessDO clientAccessDO = clientAccessDOMapper.selectByPrimaryKey(clientAccessId);
         
@@ -44,6 +44,12 @@ public class ClientAccessManager {
         clientAccessBO.setData(clientAccessDataDOs);
         
         return clientAccessBO;
+    }
+
+
+    public void getById(Integer clientAccessId) {
+        // TODO Auto-generated method stub
+        
     }
     
     

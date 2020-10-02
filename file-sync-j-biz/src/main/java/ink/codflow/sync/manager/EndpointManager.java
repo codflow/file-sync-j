@@ -7,6 +7,7 @@ import ink.codflow.sync.consts.EndpointStateEnum;
 import ink.codflow.sync.dao.EndpointDOMapper;
 import ink.codflow.sync.dao.EndpointDetailDOMapper;
 import ink.codflow.sync.entity.EndpointDO;
+import ink.codflow.sync.entity.EndpointDetailDO;
 
 /**
  * @author codflow
@@ -26,12 +27,11 @@ public class EndpointManager {
         EndpointDO record = convert2DO(endpointDTO);
         return endpointDOMapper.insert(record);
     }
-    
+
     public int updateSelective(EndpointBO endpointDTO) {
         EndpointDO record = convert2DO(endpointDTO);
         return updateSelective(record);
     }
-    
 
     public int delete(int id) {
         return endpointDOMapper.deleteByPrimaryKey(id);
@@ -49,37 +49,43 @@ public class EndpointManager {
      * @return int
      */
     private int updateSelective(EndpointDO endpointDO) {
-        return  endpointDOMapper.updateByPrimaryKeySelective(endpointDO);
+        return endpointDOMapper.updateByPrimaryKeySelective(endpointDO);
     }
 
-
-    
     EndpointDO convert2DO(EndpointBO endpointBO) {
-        
+
         String name = endpointBO.getName();
         String root = endpointBO.getRoot();
         Integer clientId = endpointBO.getClientId();
         Integer accessId = endpointBO.getClientAccessId();
-        String state = endpointBO.getState();
+        EndpointStateEnum state = endpointBO.getState();
         EndpointDO record = new EndpointDO();
         record.setClientId(clientId);
         record.setClientAccessId(accessId);
         record.setName(name);
         record.setRoot(root);
-        record.setState(state);
+        if (state != null) {
+            record.setState(state.getCode());
+        }
         return record;
     }
 
-    /**
-     * @description: TODO
-     * @param id
-     * @return EndpointBO
-     */
     public EndpointBO getById(Integer id) {
-        // TODO Auto-generated method stub
+        EndpointDO endpointDO = endpointDOMapper.selectByPrimaryKey(id);
+
+        Integer clientId = endpointDO.getClientId();
+        String name = endpointDO.getName();
+        String root = endpointDO.getRoot();
+        String state = endpointDO.getState();
+        Integer clientAccessId = endpointDO.getClientAccessId();
+
+        EndpointDetailDO endpointDetailDO = endpointDetailDOMapper.selectByPrimaryKey(id);
+        String endpointStatus = endpointDetailDO.getStatus();
+        Long usage = endpointDetailDO.getUsage();
+
+        EndpointBO endpointBO = new EndpointBO();
+
         return null;
     }
-    
-    
 
 }

@@ -33,3 +33,6 @@ dependency-reduced-pom.xml
 
 .vscode/
 .sts4-cache
+
+#db
+.*/

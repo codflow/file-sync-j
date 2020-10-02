@@ -1,5 +1,7 @@
 package ink.codflow.sync.bo;
 
+import ink.codflow.sync.consts.EndpointStateEnum;
+
 /**
  * @author codflow
  *
@@ -18,7 +20,7 @@ public class EndpointBO {
    
     String root;
     
-    String state;
+    EndpointStateEnum state;
     
     Long createTime;
     
@@ -66,11 +68,11 @@ public class EndpointBO {
         this.root = root;
     }
 
-    public String getState() {
+    public EndpointStateEnum getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(EndpointStateEnum state) {
         this.state = state;
     }
 

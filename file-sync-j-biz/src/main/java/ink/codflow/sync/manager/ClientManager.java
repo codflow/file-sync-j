@@ -38,4 +38,9 @@ public class ClientManager {
     public int deleteById(int clientId) {
         return clientDOMapper.deleteByPrimaryKey(clientId);
     }
+
+    public ClientDO getClientById(Integer clientId) {
+       ClientDO clientDO =  clientDOMapper.selectByPrimaryKey(clientId);
+       return clientDO;
+    }
 }
