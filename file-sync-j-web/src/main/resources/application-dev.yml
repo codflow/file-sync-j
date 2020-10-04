@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    username: root
+    password: 521
+    url: jdbc:mysql://localhost:3306/springboot?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC

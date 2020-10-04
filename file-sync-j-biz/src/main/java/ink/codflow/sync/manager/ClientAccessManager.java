@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import ink.codflow.sync.bo.ClientAccessBO;
+import ink.codflow.sync.consts.AuthTypeEnum;
 import ink.codflow.sync.dao.ClientAccessDOMapper;
 import ink.codflow.sync.dao.ClientAccessDataDOMapper;
 import ink.codflow.sync.entity.ClientAccessDO;
@@ -33,24 +34,20 @@ public class ClientAccessManager {
         ClientAccessBO clientAccessBO = new ClientAccessBO();
         
         Integer clientId = clientAccessDO.getClientId();
+
         String clientAccessType =  clientAccessDO.getType();
         
         clientAccessBO.setClientId(clientId);
         clientAccessBO.setId(clientAccessId);
         
-        
-        clientAccessBO.setType(clientAccessType);
-        
+        AuthTypeEnum type =  AuthTypeEnum.resolve(clientAccessType);
+        clientAccessBO.setType(type);
         clientAccessBO.setData(clientAccessDataDOs);
         
         return clientAccessBO;
     }
 
-
-    public void getById(Integer clientAccessId) {
-        // TODO Auto-generated method stub
-        
-    }
+ 
     
     
     

@@ -19,7 +19,6 @@ import ink.codflow.sync.core.handler.WorkerHandler;
 import ink.codflow.sync.exception.BackupInterruptException;
 import ink.codflow.sync.exception.FileException;
 
-
 public class SyncTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(SyncTask.class);
@@ -32,10 +31,16 @@ public class SyncTask implements Runnable {
         handlerMap.put(FileSyncMode.META_OPTIMIZED, new MetaOptFileWorkerHandler());
     }
 
-    TaskStatusListener taskStatusListener;
+    String id;
+
+    FileSyncMode mode;
+
+    TaskSpecs specs;
+
+    List<TaskStatusListener> taskStatusListeners;
 
     ClientEndpoint<?> srcEndpoint;
-    ClientEndpoint<?> distEndpoint;
+    ClientEndpoint<?> destEndpoint;
 
     List<LinkWorker> workerList = new ArrayList<LinkWorker>();
 
@@ -43,20 +48,21 @@ public class SyncTask implements Runnable {
 
     SyncProgress syncProgressView = new SyncProgress();
 
-    FileSyncMode mode;
-
     List<FileObject> selectedObjects;
 
-    String id;
-
-    TaskSpecs specs;
-
     public SyncTask(TaskSpecs specs) {
+        this();
         this.specs = specs;
+
     }
 
     public SyncTask() {
 
+        this.workerList = new ArrayList<LinkWorker>();
+
+        this.subTaskList = new ArrayList<SyncTask>();
+
+        this.syncProgressView = new SyncProgress();
     }
 
     public ClientEndpoint<?> getSrcEndpoint() {
@@ -67,24 +73,24 @@ public class SyncTask implements Runnable {
         this.srcEndpoint = srcEndpoint;
     }
 
-    public ClientEndpoint<?> getDistEndpoint() {
-        return distEndpoint;
+    public ClientEndpoint<?> getDestEndpoint() {
+        return destEndpoint;
     }
 
-    public void setDistEndpoint(ClientEndpoint<?> distEndpoint) {
-        this.distEndpoint = distEndpoint;
+    public void setDistEndpoint(ClientEndpoint<?> destEndpoint) {
+        this.destEndpoint = destEndpoint;
     }
 
     public List<LinkWorker> getWorkerList() {
         return workerList;
     }
 
-    public TaskStatusListener getTaskStatusListener() {
-        return taskStatusListener;
+    public List<TaskStatusListener> getTaskStatusListeners() {
+        return taskStatusListeners;
     }
 
-    public void setTaskStatusListener(TaskStatusListener taskStatusListener) {
-        this.taskStatusListener = taskStatusListener;
+    public void setTaskStatusListeners(List<TaskStatusListener> taskStatusListeners) {
+        this.taskStatusListeners = taskStatusListeners;
     }
 
     public void setWorkerList(List<LinkWorker> workerList) {
@@ -102,13 +108,12 @@ public class SyncTask implements Runnable {
                 doRunATask(this);
             }
         } catch (Exception e) {
-            taskStatusListener.statusChange(getSyncProgressView(), SyncStatusEnum.FAILED);
-
+            handleStateChange(getSyncProgressView(), SyncStatusEnum.FAILED);
             log.error("task error", e);
         }
     }
 
-    void doRunMultiTask( List<SyncTask> tasks) throws FileException {
+    void doRunMultiTask(List<SyncTask> tasks) throws FileException {
 
         for (SyncTask syncTask : tasks) {
             doPrepareATask(syncTask);
@@ -122,88 +127,96 @@ public class SyncTask implements Runnable {
 
     }
 
-
-
     void doPrepareATask(SyncTask task) throws FileException {
-            List<FileObject> objectUriBOs = task.selectedObjects;
-            if (objectUriBOs != null && !objectUriBOs.isEmpty()) {
-                ArrayList<SimpleObject> simpleObjects = new ArrayList<SimpleObject>();
+        List<FileObject> objectUriBOs = task.selectedObjects;
+        if (objectUriBOs != null && !objectUriBOs.isEmpty()) {
+            ArrayList<SimpleObject> simpleObjects = new ArrayList<SimpleObject>();
 
-                AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
+            AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
 
-                AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
-                SelectedLinkWorker linkWorker = new SelectedLinkWorker(srcObject, destObject, simpleObjects);
-                linkWorker.setSpecs(specs);
-                for (FileObject objectBO : objectUriBOs) {
+            AbstractObjectWapper<?> destObject = task.destEndpoint.resolve(task.destEndpoint.getRoot());
+            SelectedLinkWorker linkWorker = new SelectedLinkWorker(srcObject, destObject, simpleObjects);
+            linkWorker.setSpecs(specs);
+            for (FileObject objectBO : objectUriBOs) {
 
-                    String uri = objectBO.getUri();
-                    boolean file = objectBO.getFile();
+                String uri = objectBO.getUri();
+                boolean file = objectBO.getFile();
 
-                    SimpleObject simpleObject = new SimpleObject();
-                    simpleObject.setDir(!file);
-                    simpleObject.setPath(uri);
-                    simpleObjects.add(simpleObject);
-                }
-                FileSyncMode mode0 = task.getMode();
-                WorkerHandler handler = getHandler(mode0);
-                linkWorker.setWorkerHandler(handler);
-                task.workerList.add(linkWorker);
-
-            } else {
-
-                AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
-                AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
-
-                LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
-                linkWorker.setSpecs(specs);
-                FileSyncMode mode0 = task.getMode();
-                WorkerHandler handler = getHandler(mode0);
-                linkWorker.setWorkerHandler(handler);
-                task.workerList.add(linkWorker);
+                SimpleObject simpleObject = new SimpleObject();
+                simpleObject.setDir(!file);
+                simpleObject.setPath(uri);
+                simpleObjects.add(simpleObject);
             }
+            FileSyncMode mode0 = task.getMode();
+            WorkerHandler handler = getHandler(mode0);
+            linkWorker.setWorkerHandler(handler);
+            task.workerList.add(linkWorker);
+
+        } else {
+
+            AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
+            AbstractObjectWapper<?> destObject = task.destEndpoint.resolve(task.destEndpoint.getRoot());
+
+            LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
+            linkWorker.setSpecs(specs);
+            FileSyncMode mode0 = task.getMode();
+            WorkerHandler handler = getHandler(mode0);
+            linkWorker.setWorkerHandler(handler);
+            task.workerList.add(linkWorker);
+        }
     }
 
     void doAnalyzeTask(SyncTask task) throws FileException {
 
+        for (LinkWorker linkWorker : task.workerList) {
+            linkWorker.analyse();
+        }
 
+        if (!handleStateChange(getSyncProgressView(), getSyncProgressView().getStatus())) {
 
-            for (LinkWorker linkWorker : task.workerList) {
-                linkWorker.analyse();
-            }
-
-            if (taskStatusListener != null) {
-                if (!taskStatusListener.statusChange(getSyncProgressView(), getSyncProgressView().getStatus())) {
-                    if (task.workerList!= null) {
-                        for (LinkWorker linkWorker : task.workerList) {
-                            linkWorker.forceUpdateStatus(SyncStatusEnum.FAILED);
-                        }
-                    }
-                    if (task.subTaskList!= null) {
-                        for (SyncTask syncTask0 : task.subTaskList) {
-                            syncTask0.forceUpdateStatus(SyncStatusEnum.FAILED);
-                        }
-                    }
-
-                    throw new BackupInterruptException();
+            if (task.workerList != null) {
+                for (LinkWorker linkWorker : task.workerList) {
+                    linkWorker.forceUpdateStatus(SyncStatusEnum.FAILED);
                 }
             }
+            if (task.subTaskList != null) {
+                for (SyncTask syncTask0 : task.subTaskList) {
+                    syncTask0.forceUpdateStatus(SyncStatusEnum.FAILED);
+                }
+            }
+            throw new BackupInterruptException();
+        }
+        ;
     }
 
+    boolean handleStateChange(SyncProgress progress, SyncStatusEnum status) {
+
+        boolean result = true;
+
+        if (this.taskStatusListeners != null && !this.taskStatusListeners.isEmpty()) {
+
+            for (TaskStatusListener taskStatusListener : this.taskStatusListeners) {
+                if (taskStatusListener.statusChange(progress, status)) {
+                    continue;
+                }
+                result = false;
+            }
+        }
+        return result;
+    }
 
     void doSyncATask(SyncTask task) {
-            if (!SyncStatusEnum.FAILED.equals(getSyncProgressView().getStatus())) {
-                for (LinkWorker linkWorker : task.workerList) {
-                    linkWorker.sync();
-                }
+        if (!SyncStatusEnum.FAILED.equals(getSyncProgressView().getStatus())) {
+            for (LinkWorker linkWorker : task.workerList) {
+                linkWorker.sync();
+            }
 
-            }
-            if (taskStatusListener != null) {
-                SyncStatusEnum status = getSyncProgressView().getStatus();
-                taskStatusListener.statusChange(getSyncProgressView(), status);
-            }
+        }
+
+        SyncStatusEnum status = getSyncProgressView().getStatus();
+        handleStateChange(getSyncProgressView(), status);
+
     }
-
-
 
     void doRunATask(SyncTask task) {
 
@@ -215,7 +228,7 @@ public class SyncTask implements Runnable {
 
                 AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
 
-                AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
+                AbstractObjectWapper<?> destObject = task.destEndpoint.resolve(task.destEndpoint.getRoot());
                 SelectedLinkWorker linkWorker = new SelectedLinkWorker(srcObject, destObject, simpleObjects);
                 linkWorker.setSpecs(specs);
                 for (FileObject objectBO : objectUriBOs) {
@@ -236,7 +249,7 @@ public class SyncTask implements Runnable {
             } else {
 
                 AbstractObjectWapper<?> srcObject = task.srcEndpoint.resolve(task.srcEndpoint.getRoot());
-                AbstractObjectWapper<?> destObject = task.distEndpoint.resolve(task.distEndpoint.getRoot());
+                AbstractObjectWapper<?> destObject = task.destEndpoint.resolve(task.destEndpoint.getRoot());
 
                 LinkWorker linkWorker = new LinkWorker(srcObject, destObject);
                 linkWorker.setSpecs(specs);
@@ -251,36 +264,33 @@ public class SyncTask implements Runnable {
                 linkWorker.analyse();
             }
 
-            if (taskStatusListener != null) {
-                if (!taskStatusListener.statusChange(getSyncProgressView(), getSyncProgressView().getStatus())) {
-                    if (task.workerList!= null) {
-                        for (LinkWorker linkWorker : task.workerList) {
-                            linkWorker.forceUpdateStatus(SyncStatusEnum.FAILED);
-                        }
+            if (!handleStateChange(getSyncProgressView(), getSyncProgressView().getStatus())) {
+                if (task.workerList != null) {
+                    for (LinkWorker linkWorker : task.workerList) {
+                        linkWorker.forceUpdateStatus(SyncStatusEnum.FAILED);
                     }
-                    if (task.subTaskList!= null) {
-                        for (SyncTask syncTask0 : task.subTaskList) {
-                            syncTask0.forceUpdateStatus(SyncStatusEnum.FAILED);
-                        }
-                    }
-                    throw new BackupInterruptException();
                 }
+                if (task.subTaskList != null) {
+                    for (SyncTask syncTask0 : task.subTaskList) {
+                        syncTask0.forceUpdateStatus(SyncStatusEnum.FAILED);
+                    }
+                }
+                throw new BackupInterruptException();
             }
+
             if (!SyncStatusEnum.FAILED.equals(getSyncProgressView().getStatus())) {
                 for (LinkWorker linkWorker : task.workerList) {
                     linkWorker.sync();
                 }
 
             }
-            if (taskStatusListener != null) {
-                SyncStatusEnum status = getSyncProgressView().getStatus();
-                taskStatusListener.statusChange(getSyncProgressView(), status);
-            }
+
+            SyncStatusEnum status = getSyncProgressView().getStatus();
+            handleStateChange(getSyncProgressView(), status);
 
         } catch (Exception e) {
-            if (taskStatusListener != null) {
-                taskStatusListener.statusChange(getSyncProgressView(), SyncStatusEnum.FAILED);
-            }
+
+            handleStateChange(getSyncProgressView(), SyncStatusEnum.FAILED);
             log.error("task error0", e);
         }
 
@@ -403,8 +413,8 @@ public class SyncTask implements Runnable {
         this.specs = specs;
     }
 
-    public void forceUpdateStatus(SyncStatusEnum status){
-		this.syncProgressView.setStatus(status);
-	}
+    public void forceUpdateStatus(SyncStatusEnum status) {
+        this.syncProgressView.setStatus(status);
+    }
 
 }

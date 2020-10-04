@@ -45,6 +45,14 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
+		<dependency>  
+    <groupId>org.springframework.boot</groupId>  
+    <artifactId>spring-boot-devtools</artifactId> 
+    <!-- 关闭此项的依赖传递，即别的项目依赖该项目时，不会传递依赖此jar -->
+    <optional>true</optional>
+</dependency>  
+
 	</dependencies>
 	<build>
 

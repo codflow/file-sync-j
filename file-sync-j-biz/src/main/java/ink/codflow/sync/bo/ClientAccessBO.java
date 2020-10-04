@@ -2,6 +2,7 @@ package ink.codflow.sync.bo;
 
 import java.util.List;
 
+import ink.codflow.sync.consts.AuthTypeEnum;
 import ink.codflow.sync.entity.ClientAccessDataDO;
 
 /**
@@ -15,7 +16,7 @@ public class ClientAccessBO {
 
     Integer clientId;
 
-    String type;
+    AuthTypeEnum type;
 
     List<ClientAccessDataDO> data;
     
@@ -64,16 +65,6 @@ public class ClientAccessBO {
     }
 
 
-    public String getType() {
-        return type;
-    }
-
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-
     public Long getCreateTime() {
         return createTime;
     }
@@ -96,6 +87,14 @@ public class ClientAccessBO {
 
     public void setData(List<ClientAccessDataDO> data) {
         this.data = data;
+    }
+
+    public AuthTypeEnum getType() {
+        return type;
+    }
+
+    public void setType(AuthTypeEnum type) {
+        this.type = type;
     }
 
     

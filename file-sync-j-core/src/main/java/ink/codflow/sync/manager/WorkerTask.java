@@ -8,7 +8,7 @@ import ink.codflow.sync.task.TaskSpecs;
 
 public class WorkerTask {
 
-    Link linkBO;
+    Link link;
     
     TaskSpecs specs;
     
@@ -18,12 +18,12 @@ public class WorkerTask {
         objectList.add(e);
     }
 
-    public Link getLinkBO() {
-        return linkBO;
+    public Link getLink() {
+        return link;
     }
 
-    public void setLinkBO(Link linkBO) {
-        this.linkBO = linkBO;
+    public void setLink(Link link) {
+        this.link = link;
     }
 
     public List<FileObject> getObjectList() {

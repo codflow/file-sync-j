@@ -17,91 +17,91 @@ import ink.codflow.sync.transfer.vfs.SftpVfsClient;
 
 public class ClientEndpointPool {
 
-	Map<Integer, ClientEndpoint<?>> endpointMap = new ConcurrentHashMap<>();
+    Map<Integer, ClientEndpoint<?>> endpointMap = new ConcurrentHashMap<>();
 
-	public ClientEndpoint<?> getEndpoint(int clientId) {
-		return endpointMap.get(clientId);
+    public ClientEndpoint<?> getEndpoint(int clientId) {
+        return endpointMap.get(clientId);
 
-	}
+    }
 
-	public ClientEndpoint<?> create(Endpoint endpointBO) throws FileException {
+    public ClientEndpoint<?> create(Endpoint endpointBO) throws FileException {
 
-		ClientEndpoint<?> clientEndpoint = new ClientEndpoint<>();
-		int id = endpointBO.getId();
-		@SuppressWarnings("rawtypes")
-		Client client = doCreateClient(endpointBO);
-		clientEndpoint.addClient(client);
-		String rootPath = endpointBO.getRootPath();
-		clientEndpoint.root = rootPath;
-		clientEndpoint.setId(id);
-		endpointMap.put(id, clientEndpoint);
-		return clientEndpoint;
+        ClientEndpoint<?> clientEndpoint = new ClientEndpoint<>();
+        int id = endpointBO.getId();
+        @SuppressWarnings("rawtypes")
+        Client client = doCreateClient(endpointBO);
+        clientEndpoint.addClient(client);
+        String rootPath = endpointBO.getRootPath();
+        clientEndpoint.root = rootPath;
+        clientEndpoint.setId(id);
+        endpointMap.put(id, clientEndpoint);
+        return clientEndpoint;
 
-	}
+    }
 
-	Client<?> doCreateClient(Endpoint endpointBO) throws FileException {
-		ClientTypeEnum type = endpointBO.getType();
+    Client<?> doCreateClient(Endpoint endpointBO) throws FileException {
+        ClientTypeEnum type = endpointBO.getType();
 
-		switch (type) {
-		case LOCAL:
-			return createLocalClient();
+        switch (type) {
+            case LOCAL:
+                return createLocalClient();
 
-		case SFTP:
-			Authentication sftpAuth = endpointBO.getAuthentication();
-			return createSftpClient(sftpAuth);
-		case OSS:
+            case SFTP:
+                Authentication sftpAuth = endpointBO.getAuthentication();
+                return createSftpClient(sftpAuth);
+            case OSS:
 
-			Authentication ossAuth = endpointBO.getAuthentication();
-			return createOssClient(ossAuth);
+                Authentication ossAuth = endpointBO.getAuthentication();
+                return createOssClient(ossAuth);
 
-		default:
-			break;
-		}
+            default:
+                break;
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	private Client<?> createOssClient(Authentication ossAuth) {
-		
-		String endpoint = ossAuth.getParam(AuthDataType.HOST);
-		String ak = ossAuth.getParam(AuthDataType.AK);
-		String sk = ossAuth.getParam(AuthDataType.SK);
-		String bucketName = ossAuth.getParam(AuthDataType.BKT);
-		OssAuthentication authentication = new OssAuthentication();
-		authentication.setAccessKeyId(ak);
-		authentication.setAccessKeySecret(sk);
-		authentication.setEndpoint(endpoint);
-		authentication.setBucketName(bucketName);
-		OssClient client = new OssClient(authentication);
-		return client;
-	}
+    private Client<?> createOssClient(Authentication ossAuth) {
 
-	private LocalVfsClient createLocalClient() {
-		LocalVfsClient cLocalVfsClient = new LocalVfsClient();
-		return cLocalVfsClient;
-	}
+        String endpoint = ossAuth.getParam(AuthDataType.HOST);
+        String ak = ossAuth.getParam(AuthDataType.AK);
+        String sk = ossAuth.getParam(AuthDataType.SK);
+        String bucketName = ossAuth.getParam(AuthDataType.BKT);
+        OssAuthentication authentication = new OssAuthentication();
+        authentication.setAccessKeyId(ak);
+        authentication.setAccessKeySecret(sk);
+        authentication.setEndpoint(endpoint);
+        authentication.setBucketName(bucketName);
+        OssClient client = new OssClient(authentication);
+        return client;
+    }
 
-	SftpVfsClient createSftpClient(Authentication auth) throws FileException {
+    private LocalVfsClient createLocalClient() {
+        LocalVfsClient cLocalVfsClient = new LocalVfsClient();
+        return cLocalVfsClient;
+    }
 
-		AuthenticationType authType = auth.getAuthType();
-		String host = auth.getParam(AuthDataType.HOST);
-		String userName = auth.getParam(AuthDataType.USERNAME);
+    SftpVfsClient createSftpClient(Authentication auth) throws FileException {
 
-		switch (authType) {
-		case PASSWORD:
+        AuthenticationType authType = auth.getAuthType();
+        String host = auth.getParam(AuthDataType.HOST);
+        String userName = auth.getParam(AuthDataType.USERNAME);
 
-			String password = auth.getParam(AuthDataType.PASSWD);
-			SftpVfsClient sftpVfsClient0 = new SftpVfsClient(host);
-			sftpVfsClient0.addPasswordIdentity(null, userName, password);
-			return sftpVfsClient0;
-		case PUBKEY:
-			String privateKeyPath = LocalSecurityManager.seekLocalUserPrivateKeyPath();
-			SftpVfsClient sftpVfsClient = new SftpVfsClient(host);
-			sftpVfsClient.addPublicKeyIdentity(userName, privateKeyPath);
-			return sftpVfsClient;
-		default:
-			return null;
-		}
-	}
+        switch (authType) {
+            case PASSWORD:
+
+                String password = auth.getParam(AuthDataType.PASSWD);
+                SftpVfsClient sftpVfsClient0 = new SftpVfsClient(host);
+                sftpVfsClient0.addPasswordIdentity(null, userName, password);
+                return sftpVfsClient0;
+            case PUBKEY:
+                String privateKeyPath = LocalSecurityManager.seekLocalUserPrivateKeyPath();
+                SftpVfsClient sftpVfsClient = new SftpVfsClient(host);
+                sftpVfsClient.addPublicKeyIdentity(userName, privateKeyPath);
+                return sftpVfsClient;
+            default:
+                return null;
+        }
+    }
 
 }

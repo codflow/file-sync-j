@@ -272,7 +272,7 @@ public class MainInterface {
 		FileSyncMode mode = getSelectedMode();
 		linkBO.setMode(mode);
 		WorkerTask workertaskBO = new WorkerTask();
-		workertaskBO.setLinkBO(linkBO);
+		workertaskBO.setLink(linkBO);
 		Task taskBO = new Task();
 		taskBO.addWorkerTask(workertaskBO);
 		return taskBO;

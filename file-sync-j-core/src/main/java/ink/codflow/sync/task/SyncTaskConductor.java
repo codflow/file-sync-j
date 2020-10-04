@@ -15,8 +15,7 @@ import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.util.IdGen;
 
 public class SyncTaskConductor {
-    
-    
+
     int maxThreadSize = 20;
 
     ThreadPoolExecutor pool = new ThreadPoolExecutor(10, maxThreadSize, 2000, TimeUnit.MILLISECONDS,
@@ -45,16 +44,17 @@ public class SyncTaskConductor {
         return endPoint;
     }
 
-    public SyncTask createSyncTask(Link link, List<FileObject> selectedObjects, FileSyncMode mode) throws FileException {
+    public SyncTask createSyncTask(Link link, List<FileObject> selectedObjects, FileSyncMode mode)
+            throws FileException {
 
         FileSyncMode mode0 = mode != null ? mode : link.getMode();
         return createTask(link, selectedObjects, mode0);
     }
 
     public String launch(SyncTask task) {
-        
+
         String id = task.getId();
-        String traceId ="T-"+id;
+        String traceId = "T-" + id;
         cacheMap.put(traceId, task);
         pool.submit(task);
         return traceId;
@@ -65,7 +65,7 @@ public class SyncTaskConductor {
         ClientEndpoint<?> srcEndpoint = clientPool.getEndpoint(srcEndpointId);
         ClientEndpoint<?> dstEndpoint = clientPool.getEndpoint(dstEndpointId);
         return createTask(srcEndpoint, dstEndpoint, selectedObjects, mode);
-        
+
     }
 
     protected SyncTask createTask(ClientEndpoint<?> srcEndpoint, ClientEndpoint<?> dstEndpoint,
@@ -103,18 +103,39 @@ public class SyncTaskConductor {
     }
 
     public SyncTask createSyncTask(Task taskBO) throws FileException {
+        List<WorkerTask> workerTasklist = taskBO.getWorkerTasklist();
+        SyncTask task = createSyncTask(workerTasklist);
+        return task;
+    }
 
+    public SyncTask createSyncTask(WorkerTask workerTask) throws FileException {
+        List<FileObject> objectUriList = workerTask.getObjectList();
+        Link linkBO = workerTask.getLink();
+        Endpoint distEndpointBO = linkBO.getDestEndpoint();
+        Endpoint srcEndpointBO = linkBO.getSrcEndpoint();
+        if (distEndpointBO.getId() == srcEndpointBO.getId()) {
+
+        }
+        FileSyncMode mode = linkBO.getMode();
+        registerEndpoint(srcEndpointBO);
+        registerEndpoint(distEndpointBO);
+        TaskSpecs specs = workerTask.getSpecs();
+        SyncTask syncTask = createTask(linkBO, objectUriList, mode);
+        syncTask.setSpecs(specs);
+        return syncTask;
+    }
+
+    private SyncTask createSyncTask(List<WorkerTask> workerTasklist) throws FileException {
         SyncTask task = new SyncTask();
         task.setId(IdGen.genUUID());
-        List<WorkerTask> workerTasklist = taskBO.getWorkerTasklist();
         for (WorkerTask workerTaskBO : workerTasklist) {
             List<FileObject> objectUriList = workerTaskBO.getObjectList();
-            Link linkBO = workerTaskBO.getLinkBO();
+            Link linkBO = workerTaskBO.getLink();
             Endpoint distEndpointBO = linkBO.getDestEndpoint();
             Endpoint srcEndpointBO = linkBO.getSrcEndpoint();
             if (distEndpointBO.getId() == srcEndpointBO.getId()) {
-				
-			}
+
+            }
             FileSyncMode mode = linkBO.getMode();
             registerEndpoint(srcEndpointBO);
             registerEndpoint(distEndpointBO);
@@ -129,19 +150,15 @@ public class SyncTaskConductor {
     public boolean checkAndTryCancle(String traceId) {
         SyncTask task = cacheMap.get(traceId);
         SyncStatusEnum status = task.getSyncProgressView().getStatus();
-        if (SyncStatusEnum.DONE.equals(status)&& SyncStatusEnum.FAILED.equals(status)) {
+        if (SyncStatusEnum.DONE.equals(status) && SyncStatusEnum.FAILED.equals(status)) {
             return true;
         }
-    
+
         return false;
     }
-    
+
     public int countTaskInProgress() {
-    	return pool.getActiveCount();
+        return pool.getActiveCount();
     }
-    
-    
-    
-    
 
 }

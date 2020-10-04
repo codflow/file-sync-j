@@ -8,7 +8,7 @@ public class Endpoint {
     String name;
     String authId;
     
-    Authentication authenticationBO;
+    Authentication authentication;
     
     ClientTypeEnum type; 
     String rootPath;
@@ -59,14 +59,14 @@ public class Endpoint {
      * @return the authenticationBO
      */
     public Authentication getAuthentication() {
-        return authenticationBO;
+        return authentication;
     }
 
     /**
      * @param authenticationBO the authenticationBO to set
      */
-    public void setAuthentication(Authentication authenticationBO) {
-        this.authenticationBO = authenticationBO;
+    public void setAuthentication(Authentication authentication) {
+        this.authentication = authentication;
     }
 
     /**

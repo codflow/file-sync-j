@@ -42,6 +42,10 @@ public class FileSyncManager {
 		return task;
 	}
 
+	public SyncTask createSyncTask(WorkerTask workerTask) throws FileException {
+		return conductor.createSyncTask(workerTask);
+	}
+
 	public SyncTask createSyncTask(Task taskBO) throws FileException {
 
 		return conductor.createSyncTask(taskBO);
