@@ -2,6 +2,7 @@ package ink.codflow.sync.service;
 
 import java.util.List;
 
+import ink.codflow.sync.bo.LinkBO;
 import ink.codflow.sync.dto.LinkDTO;
 import ink.codflow.sync.manager.EndpointManager;
 import ink.codflow.sync.manager.LinkManager;
@@ -16,8 +17,10 @@ public class LinkService {
     int create(LinkDTO linkDTO){
         Integer sourceId = linkDTO.getSourceId();
         Integer targetId = linkDTO.getSourceId();
-        
-        
+        LinkBO linkBO = new LinkBO();
+        linkBO.setSourceId(sourceId);
+        linkBO.setTargetId(targetId);
+        linkManager.save(linkBO);
         return 0;
     }
 

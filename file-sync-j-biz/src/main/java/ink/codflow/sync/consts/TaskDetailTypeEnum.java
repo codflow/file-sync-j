@@ -1,7 +1,5 @@
 package ink.codflow.sync.consts;
 
-public enum TaskSpecType {
+public enum TaskDetailTypeEnum {
     
-    EXPIRE;
-
 }
