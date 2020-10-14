@@ -3,12 +3,14 @@ package ink.codflow.sync.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.core.appender.FileManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import ink.codflow.sync.bo.ClientAccessBO;
 import ink.codflow.sync.bo.EndpointBO;
 import ink.codflow.sync.bo.LinkBO;
 import ink.codflow.sync.bo.TaskBO;
+import ink.codflow.sync.bo.TaskDetailBO;
 import ink.codflow.sync.consts.AuthDataType;
 import ink.codflow.sync.consts.AuthTypeEnum;
 import ink.codflow.sync.consts.AuthenticationType;
@@ -16,6 +18,7 @@ import ink.codflow.sync.consts.SyncStatusEnum;
 import ink.codflow.sync.core.SyncProgress;
 import ink.codflow.sync.dto.TaskDTO;
 import ink.codflow.sync.entity.ClientAccessDataDO;
+import ink.codflow.sync.entity.TaskDetailDO;
 import ink.codflow.sync.exception.AuthTypeException;
 import ink.codflow.sync.exception.FileException;
 import ink.codflow.sync.manager.Authentication;
@@ -26,7 +29,6 @@ import ink.codflow.sync.manager.EndpointManager;
 import ink.codflow.sync.manager.FileSyncManager;
 import ink.codflow.sync.manager.Link;
 import ink.codflow.sync.manager.LinkManager;
-import ink.codflow.sync.manager.Task;
 import ink.codflow.sync.manager.TaskManager;
 import ink.codflow.sync.manager.WorkerTask;
 import ink.codflow.sync.task.SyncTask;
@@ -54,16 +56,20 @@ public class TaskService {
     @Autowired
     TaskManager taskManager;
 
-    public TaskDTO createTask(String taskId) {
+    public TaskDTO createTask(String taskId,boolean start) {
 
         try {
             SyncTask syncTask = prepareTask(taskId);
             String traceId = syncTask.getId();
             addListener(syncTask);
+            if(start){
+                fileSyncManager.launchTask(syncTask);
+
+            }
         } catch (FileException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("create task failed", e);
         }
+
         return null;
     }
 
@@ -73,7 +79,7 @@ public class TaskService {
         List<TaskStatusListener> listeners = new ArrayList<>();
         listeners.add(progressUpdateListener);
         syncTask.setTaskStatusListeners(listeners);
-    }
+    } 
 
     public TaskDTO getByTaskId(String taskId) {
         return null;
@@ -105,6 +111,25 @@ public class TaskService {
 
         SyncTask syncTask = fileSyncManager.createSyncTask(subTask);
         return syncTask;
+    }
+
+    public String startTask(SyncTask syncTask){
+
+        String traceId = fileSyncManager.launchTask(syncTask);
+        
+
+        return null;
+    }
+
+    void updateTaskStatus(SyncTask syncTask){
+        
+    }
+
+    void updateTaskStatus(String traceId , String taskId , SyncProgress progress){
+        TaskDetailBO taskDetailBO = new TaskDetailBO();
+        
+        taskManager.updateTaskDetail(taskDetailBO);
+
     }
 
     private Endpoint fillEndpoint(Integer sourceEndpointId) {
@@ -149,6 +174,7 @@ public class TaskService {
     }
 
     public void cancleTask(String taskId) {
+
 
     }
 
